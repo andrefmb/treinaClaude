@@ -1,0 +1,14 @@
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+
+# Editores
+.vscode/
+.idea/
+
+# Artefato de publicação pré-existente (repo git aninhado) — não versionar
+treinamento-claude-seguros/_site_publish/

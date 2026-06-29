@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trilhas de IA · Dominando o Claude e o NotebookLM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@300..700&family=JetBrains+Mono:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  :root{--navy:#16365c;--navy-deep:#0e2742;--navy-soft:#e7eef6;--gold:#b5872f;--gold-soft:#f3ead6;
+        --paper:#f7f4ee;--card:#fffefb;--ink:#1c2433;--muted:#5c6675;--line:#e4ddd0;--radius:16px;
+        --fd:"Fraunces",Georgia,serif;--fs:"Inter",system-ui,sans-serif;--fm:"JetBrains Mono",monospace;}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 500px at 100% -10%,var(--gold-soft) 0%,transparent 55%),
+       radial-gradient(1000px 600px at -10% 0%,var(--navy-soft) 0%,transparent 50%),var(--paper);
+       background-attachment:fixed;color:var(--ink);font-family:var(--fs);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:clamp(32px,7vw,72px) clamp(18px,5vw,40px) 100px}
+  .kicker{font-family:var(--fm);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600}
+  h1{font-family:var(--fd);font-size:clamp(2.4rem,7vw,3.8rem);font-weight:600;line-height:1.1;margin:.15em 0 .1em;letter-spacing:-.01em}
+  h1 .accent{color:var(--gold);font-style:italic}
+  .lede{font-size:1.2rem;color:var(--muted);max-width:62ch;margin:.4em 0 0}
+  h2{font-family:var(--fd);font-size:1.4rem;font-weight:560;margin:2.4em 0 .2em}
+  .sub{color:var(--muted);font-family:var(--fm);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:1em}
+  .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:1em 0}
+  .card{display:block;text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:var(--radius);
+        background:var(--card);padding:22px;transition:transform .14s,border-color .14s,box-shadow .14s}
+  .card:hover{transform:translateY(-3px);border-color:var(--navy);box-shadow:0 14px 34px -18px rgba(22,54,92,.45)}
+  .card.feat{border-color:var(--navy);border-top:4px solid var(--gold)}
+  .card .tag{font-family:var(--fm);font-size:.66rem;text-transform:uppercase;letter-spacing:.06em;color:var(--gold);font-weight:700}
+  .card h3{font-family:var(--fd);font-size:1.35rem;font-weight:600;margin:.3em 0 .2em}
+  .card p{margin:.2em 0 .8em;color:var(--muted);font-size:.95rem}
+  .card .go{font-weight:600;color:var(--navy)}
+  .alt{display:flex;gap:14px;flex-wrap:wrap;margin-top:.4em;font-size:.85rem}
+  .alt a{font-family:var(--fm);color:var(--navy);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:3px 11px}
+  .alt a:hover{background:var(--navy-soft)}
+  footer{color:#8a92a0;font-size:.82rem;border-top:1px solid var(--line);margin-top:3em;padding-top:18px}
+</style></head>
+<body><div class="wrap">
+  <div class="kicker">Trilhas de IA para liderança</div>
+  <h1>Dominando o <span class="accent">Claude</span> e o NotebookLM</h1>
+  <p class="lede">Quatro trilhas interativas, em português, com o mesmo formato e identidade.
+  Cada uma tem versões para o participante e para o facilitador. Escolha por onde começar.</p>
+
+  <h2>Trilhas executivas</h2>
+  <div class="sub">o foco da maioria das turmas</div>
+  <div class="grid">
+    <a class="card feat" href="treinamento-claude-executivo-v2/index.html">
+      <span class="tag">Claude · Executivo</span>
+      <h3>Dominando o Claude</h3>
+      <p>Versão executiva geral: relatórios, apresentações, concorrência e mercado, o poder das perguntas, e-mail/agenda. Caso fictício Aurora S.A.</p>
+      <span class="go">Abrir trilha →</span>
+      <div class="alt">
+        <a href="treinamento-claude-executivo-v2/treinamento-aluno.html">Aluno (1 arquivo)</a>
+        <a href="treinamento-claude-executivo-v2/treinamento-facilitador.html">Facilitador</a>
+      </div>
+    </a>
+    <a class="card feat" href="treinamento-notebooklm-executivo/index.html">
+      <span class="tag">NotebookLM · Executivo</span>
+      <h3>Dominando o NotebookLM</h3>
+      <p>A ferramenta do Google que lê a sua pilha de documentos e responde ancorada nas fontes, com citações. Mesmas fontes da Aurora.</p>
+      <span class="go">Abrir trilha →</span>
+      <div class="alt">
+        <a href="treinamento-notebooklm-executivo/treinamento-aluno.html">Aluno (1 arquivo)</a>
+        <a href="treinamento-notebooklm-executivo/treinamento-facilitador.html">Facilitador</a>
+      </div>
+    </a>
+  </div>
+
+  <h2>Outras trilhas</h2>
+  <div class="sub">setorial e introdutória</div>
+  <div class="grid">
+    <a class="card" href="treinamento-claude-seguros/index.html">
+      <span class="tag">Claude · Seguro Garantia</span>
+      <h3>Dominando o Claude (V1)</h3>
+      <p>Versão setorial para seguradora — caso fictício Bastião. Subscrição, carteira, data room e governança.</p>
+      <span class="go">Abrir trilha →</span>
+      <div class="alt">
+        <a href="treinamento-claude-seguros/treinamento-aluno.html">Aluno</a>
+        <a href="treinamento-claude-seguros/treinamento-facilitador.html">Facilitador</a>
+      </div>
+    </a>
+    <a class="card" href="prosus-curso-ptbr/index.html">
+      <span class="tag">Claude Code · curso .md</span>
+      <h3>Curso .md (pt-BR)</h3>
+      <p>Recriação local do currículo de exercícios de Claude Code, em português.</p>
+      <span class="go">Abrir trilha →</span>
+    </a>
+  </div>
+
+  <footer>Conteúdo de treinamento · casos e dados fictícios · feito para fins educacionais.</footer>
+</div></body></html>

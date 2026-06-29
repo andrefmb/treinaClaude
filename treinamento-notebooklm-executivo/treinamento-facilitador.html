@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Dominando o NotebookLM — guia do facilitador</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@300..700&family=JetBrains+Mono:wght@400..700&display=swap" rel="stylesheet"><style>/* ==========================================================================
+   Dominando o Claude — Programa Executivo (Seguro Garantia)
+   Tema editorial profissional: papel quente, serifa elegante, navy + ouro.
+   ========================================================================== */
+
+:root {
+  --navy:        #16365c;   /* acento primário — confiança */
+  --navy-deep:   #0e2742;
+  --navy-soft:   #e7eef6;
+  --gold:        #b5872f;   /* ouro refinado — destaques */
+  --gold-soft:   #f3ead6;
+  --paper:       #f7f4ee;   /* fundo papel quente */
+  --paper-2:     #fffdf8;
+  --card:        #fffefb;
+  --ink:         #1c2433;
+  --ink-soft:    #2c3647;
+  --muted:       #5c6675;
+  --muted-2:     #8a92a0;
+  --line:        #e4ddd0;
+  --line-soft:   #efe9dd;
+  --code-bg:     #0e2742;
+  --code-ink:    #e9eef5;
+  --ok:          #2f7d57;
+  --ok-soft:     #e1f0e8;
+  --warn:        #a8641a;
+  --warn-soft:   #f8ecd9;
+  --danger:      #a83232;
+
+  --radius:      16px;
+  --maxw:        780px;
+
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-sans:    "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 500px at 100% -10%, var(--gold-soft) 0%, transparent 55%),
+    radial-gradient(1000px 600px at -10% 0%, var(--navy-soft) 0%, transparent 50%),
+    var(--paper);
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.72;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+a { color: inherit; }
+
+/* ---------- Topbar ---------- */
+.topbar {
+  position: sticky; top: 0; z-index: 40;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 13px clamp(16px, 5vw, 44px);
+  background: color-mix(in srgb, var(--paper) 86%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.brand { text-decoration: none; display: inline-flex; align-items: baseline; gap: 9px; }
+.brand .mark {
+  font-family: var(--font-display);
+  font-weight: 600; font-size: 1.25rem; color: var(--navy);
+  letter-spacing: -0.01em;
+}
+.brand .sub {
+  font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--gold);
+}
+.topnav { display: flex; gap: 4px; align-items: center; }
+.topnav a {
+  text-decoration: none; color: var(--muted); font-size: 0.92rem;
+  padding: 7px 13px; border-radius: 999px; transition: all .15s; font-weight: 500;
+}
+.topnav a:hover { color: var(--navy); background: var(--navy-soft); }
+.topnav a.active { color: #fff; background: var(--navy); }
+
+/* ---------- Layout ---------- */
+main { padding: clamp(28px, 6vw, 60px) clamp(16px, 5vw, 44px) 120px; }
+.wrap { max-width: var(--maxw); margin: 0 auto; }
+.wrap-wide { max-width: 1060px; margin: 0 auto; }
+
+/* ---------- Tipografia ---------- */
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.14; letter-spacing: -0.01em; color: var(--ink); }
+h1 { font-size: clamp(2.2rem, 6vw, 3.2rem); margin: 0.18em 0 0.1em; font-weight: 600; }
+h2 { font-size: 1.7rem; margin: 2.2em 0 0.5em; font-weight: 560; }
+h3 { font-size: 1.24rem; margin: 1.6em 0 0.4em; font-weight: 560; }
+p { margin: 0.9em 0; }
+.lede { font-size: 1.24rem; color: var(--muted); margin-top: 0.4em; line-height: 1.6; }
+.subtitle { font-size: 1.12rem; color: var(--gold); font-weight: 500; margin: 0.1em 0 0.9em; font-style: italic; font-family: var(--font-display); }
+strong { font-weight: 650; color: var(--ink); }
+em { font-style: italic; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 2.4em 0; }
+.kicker {
+  font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 6px;
+}
+
+/* ---------- Breadcrumb / meta ---------- */
+.breadcrumb {
+  display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+  color: var(--muted); font-size: 0.9rem; margin-bottom: 16px;
+}
+.breadcrumb:hover { color: var(--navy); }
+.meta-pill {
+  font-family: var(--font-mono); font-size: 0.76rem; letter-spacing: 0.03em;
+  color: var(--muted); text-transform: uppercase; border: 1px solid var(--line);
+  border-radius: 999px; padding: 5px 13px; display: inline-block; margin-bottom: 14px;
+  background: var(--paper-2);
+}
+.mod-number {
+  font-family: var(--font-mono); font-size: 2.4rem; font-weight: 700;
+  color: var(--navy); line-height: 1; opacity: .85;
+}
+
+/* ---------- Prompt / copy ---------- */
+.prompt-label {
+  font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--gold); margin: 1.5em 0 6px;
+  display: flex; align-items: center; gap: 8px; font-weight: 600;
+}
+.prompt-label::before { content: "▍"; color: var(--gold); }
+.codeblock {
+  position: relative; background: var(--code-bg); color: var(--code-ink);
+  border-radius: var(--radius); border: 1px solid var(--navy-deep);
+  margin: 0.4em 0 1.4em; overflow: hidden;
+  box-shadow: 0 14px 34px -18px rgba(14,39,66,.5);
+}
+.codeblock pre {
+  margin: 0; padding: 18px 16px 18px 18px; font-family: var(--font-mono);
+  font-size: 0.9rem; line-height: 1.62; white-space: pre-wrap; word-break: break-word;
+}
+.copy-btn {
+  position: absolute; top: 9px; right: 9px; font-family: var(--font-mono);
+  font-size: 0.71rem; letter-spacing: 0.03em; color: #d6deea;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 8px; padding: 5px 11px; cursor: pointer; transition: all .15s;
+}
+.copy-btn:hover { background: var(--gold); color: #fff; border-color: var(--gold); }
+.copy-btn.copied { background: var(--ok); color: #fff; border-color: var(--ok); }
+code.inline {
+  font-family: var(--font-mono); font-size: 0.86em; background: var(--navy-soft);
+  border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; color: var(--navy-deep);
+}
+
+/* ---------- Dicas (colinha) ---------- */
+ol.tips { list-style: none; counter-reset: tip; padding: 0; margin: 1.4em 0; display: flex; flex-direction: column; gap: 10px; }
+ol.tips li {
+  counter-increment: tip; position: relative; padding: 14px 16px 14px 58px;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--card);
+}
+ol.tips li::before {
+  content: counter(tip); position: absolute; left: 14px; top: 13px;
+  width: 30px; height: 30px; border-radius: 999px; background: var(--navy); color: #fff;
+  font-family: var(--font-mono); font-weight: 700; font-size: .9rem;
+  display: grid; place-items: center;
+}
+ol.tips .tip-t { display: block; font-weight: 650; color: var(--ink); }
+ol.tips .tip-s { display: block; color: var(--muted); font-size: .92rem; margin-top: 2px; }
+
+/* ---------- Chips de arquivo do exercício ---------- */
+.exfiles { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0.7em 0 1.1em; }
+.exfiles-label { font-family: var(--font-mono); font-size: .66rem; text-transform: uppercase;
+  letter-spacing: .07em; color: var(--muted-2); }
+.filechip { display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+  font-family: var(--font-mono); font-size: .8rem; color: var(--navy); background: var(--navy-soft);
+  border: 1px solid color-mix(in srgb, var(--navy) 22%, var(--line)); border-radius: 999px;
+  padding: 4px 12px; transition: all .14s; cursor: pointer; }
+.filechip:hover { background: var(--navy); color: #fff; }
+.filechip .dl { opacity: .65; font-weight: 700; }
+
+/* ---------- Glossário ---------- */
+.term { border-bottom: 2px dotted var(--gold); cursor: help; position: relative; font-weight: 550; }
+.term:focus { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 3px; }
+.term .tip {
+  position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%);
+  width: min(330px, 80vw); background: var(--navy-deep); color: #eef3f9;
+  font-family: var(--font-sans); font-weight: 400; font-size: 0.85rem; line-height: 1.5;
+  padding: 12px 14px; border-radius: 12px; box-shadow: 0 16px 40px rgba(14,39,66,.4);
+  opacity: 0; visibility: hidden; transition: opacity .14s, transform .14s; z-index: 60;
+  text-align: left; pointer-events: none;
+}
+.term .tip strong {
+  color: var(--gold); display: block; margin-bottom: 3px; font-family: var(--font-mono);
+  font-size: 0.74rem; text-transform: uppercase; letter-spacing: .05em;
+}
+.term .tip::after {
+  content: ""; position: absolute; top: 100%; left: calc(50% + var(--arrow-shift, 0px));
+  transform: translateX(-50%);
+  border: 7px solid transparent; border-top-color: var(--navy-deep);
+}
+.term:hover .tip, .term:focus .tip, .term.open .tip {
+  opacity: 1; visibility: visible; transform: translateX(-50%) translateY(-2px);
+}
+
+/* ---------- Collapsibles ---------- */
+details.box {
+  border: 1px solid var(--line); border-radius: var(--radius); margin: 1.1em 0;
+  background: var(--card);
+}
+details.box > summary {
+  cursor: pointer; list-style: none; padding: 14px 18px; font-weight: 600;
+  font-size: 0.98rem; display: flex; align-items: center; gap: 10px; user-select: none;
+}
+details.box > summary::-webkit-details-marker { display: none; }
+details.box > summary::before { content: "›"; color: var(--gold); font-weight: 700; font-size: 1.2em; transition: transform .18s; display: inline-block; }
+details.box[open] > summary::before { transform: rotate(90deg); }
+details.box > summary .tag {
+  font-family: var(--font-mono); font-size: 0.64rem; text-transform: uppercase;
+  letter-spacing: .07em; color: var(--navy); background: var(--navy-soft);
+  border-radius: 6px; padding: 2px 8px; font-weight: 600;
+}
+details.box .box-body { padding: 2px 18px 18px; color: var(--ink-soft); }
+details.box .box-body > *:first-child { margin-top: 0; }
+
+/* ---------- Callouts ---------- */
+.callout {
+  border-left: 3px solid var(--navy); background: var(--card);
+  border-radius: 0 var(--radius) var(--radius) 0; padding: 14px 18px; margin: 1.3em 0;
+  color: var(--ink-soft);
+}
+.callout.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.callout.tip { border-left-color: var(--ok); background: var(--ok-soft); }
+.callout.gold { border-left-color: var(--gold); background: var(--gold-soft); }
+.callout .label {
+  font-family: var(--font-mono); font-size: 0.71rem; text-transform: uppercase;
+  letter-spacing: .07em; color: var(--muted-2); display: block; margin-bottom: 4px; font-weight: 600;
+}
+.callout.warn .label { color: var(--warn); }
+.callout.tip .label { color: var(--ok); }
+.callout.gold .label { color: var(--gold); }
+
+/* ---------- Exercício (mão na massa) ---------- */
+.handson {
+  border: 1.5px solid var(--gold); border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--gold-soft) 0%, var(--card) 36%);
+  padding: 18px 20px; margin: 1.6em 0;
+}
+.handson .ho-head {
+  font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 2px;
+}
+.handson h3 { margin: 0 0 0.3em; }
+
+/* ---------- Comparação fraco vs brief ---------- */
+.compare { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; margin: 1.3em 0; }
+.compare .col { border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; background: var(--card); }
+.compare .col.weak { border-style: dashed; }
+.compare .col.strong { border-color: var(--navy); box-shadow: 0 10px 28px -16px rgba(22,54,92,.4); }
+.compare .col .k { font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted-2); }
+.compare .col.strong .k { color: var(--navy); }
+@media (max-width: 620px) { .compare { grid-template-columns: 1fr; } }
+
+/* ---------- Stat cards ---------- */
+.stat-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin: 1.3em 0; }
+.stat {
+  border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px;
+  background: var(--card); border-top: 3px solid var(--gold);
+}
+.stat .v { font-family: var(--font-display); font-size: 1.9rem; font-weight: 600; color: var(--navy); line-height: 1.05; }
+.stat .l { font-size: 0.88rem; color: var(--muted); margin-top: 4px; }
+
+/* ---------- Tabelas ---------- */
+/* sem overflow:hidden para não recortar tooltips dentro de células;
+   cantos arredondados via radius nas células das pontas */
+table.t { width: 100%; border-collapse: collapse; margin: 1.2em 0; font-size: 0.93rem; background: var(--card); border-radius: var(--radius); }
+table.t th, table.t td { text-align: left; padding: 10px 13px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.t th { background: var(--navy); color: #fff; font-weight: 600; font-size: 0.82rem; letter-spacing: .02em; }
+table.t thead th:first-child { border-top-left-radius: var(--radius); }
+table.t thead th:last-child { border-top-right-radius: var(--radius); }
+table.t tr:last-child td:first-child { border-bottom-left-radius: var(--radius); }
+table.t tr:last-child td:last-child { border-bottom-right-radius: var(--radius); }
+table.t tr:last-child td { border-bottom: 0; }
+table.t td:first-child { font-weight: 600; color: var(--navy-deep); }
+
+/* ---------- Botões ---------- */
+.btn {
+  display: inline-block; background: var(--navy); color: #fff; text-decoration: none;
+  font-weight: 600; padding: 13px 28px; border-radius: 999px; font-size: 1.0rem;
+  transition: all .14s; border: none; cursor: pointer; font-family: var(--font-sans);
+}
+.btn:hover { transform: translateY(-1px); box-shadow: 0 12px 28px -10px rgba(22,54,92,.55); background: var(--navy-deep); }
+.btn.ghost { background: transparent; color: var(--navy); border: 1.5px solid var(--navy); }
+.btn.ghost:hover { background: var(--navy-soft); box-shadow: none; }
+.btn.gold { background: var(--gold); }
+.btn.gold:hover { background: #9c7327; box-shadow: 0 12px 28px -10px rgba(181,135,47,.55); }
+
+/* ---------- Hero ---------- */
+.hero { padding: 5vh 0 2vh; }
+.hero .kicker { font-size: 0.8rem; }
+.hero h1 { font-size: clamp(2.6rem, 8vw, 4.4rem); max-width: 14ch; }
+.hero .accent { color: var(--gold); font-style: italic; }
+.hero .lede { max-width: 60ch; }
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 1.6em; }
+
+/* ---------- Lista de módulos ---------- */
+.act-head { margin-top: 2.4em; }
+.act-head h2 { margin-bottom: 0.06em; }
+.act-head .act-sub { color: var(--muted); font-family: var(--font-mono); font-size: 0.82rem; text-transform: uppercase; letter-spacing: .05em; }
+.mod-list { list-style: none; padding: 0; margin: 1em 0; display: flex; flex-direction: column; gap: 9px; }
+.mod-row {
+  display: flex; align-items: center; gap: 16px; padding: 15px 18px;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--card);
+  text-decoration: none; color: inherit; transition: all .14s;
+}
+.mod-row:hover { border-color: var(--navy); transform: translateX(3px); box-shadow: 0 8px 22px -14px rgba(22,54,92,.4); }
+.mod-row .num { font-family: var(--font-mono); font-weight: 700; color: var(--gold); min-width: 30px; font-size: 1.05rem; }
+.mod-row .body { flex: 1; }
+.mod-row .title { font-weight: 600; font-size: 1.05rem; }
+.mod-row .desc { font-size: 0.88rem; color: var(--muted); }
+.mod-row .dur { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted-2); white-space: nowrap; }
+.mod-row .check {
+  width: 24px; height: 24px; border-radius: 999px; border: 2px solid var(--line);
+  display: grid; place-items: center; font-size: 0.82rem; color: transparent; flex-shrink: 0;
+}
+.mod-row.done .check { background: var(--ok); border-color: var(--ok); color: #fff; }
+.mod-row.done .title { color: var(--muted); }
+
+.progress-bar { height: 9px; background: var(--line); border-radius: 999px; overflow: hidden; margin: 12px 0 4px; }
+.progress-bar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--navy), var(--gold)); width: 0; transition: width .4s; }
+.progress-text { font-family: var(--font-mono); font-size: 0.82rem; color: var(--muted); }
+
+/* ---------- Done / prevnext ---------- */
+.done-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 2.6em 0 1.4em;
+  padding: 18px; border: 1px dashed var(--gold); border-radius: var(--radius); background: var(--gold-soft);
+}
+.done-bar .grow { flex: 1; min-width: 180px; }
+.done-bar.is-done { border-style: solid; border-color: var(--ok); background: var(--ok-soft); }
+.prevnext { display: flex; justify-content: space-between; gap: 12px; margin-top: 1.4em; }
+.prevnext a { flex: 1; text-decoration: none; color: inherit; border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 16px; transition: border-color .15s; background: var(--card); }
+.prevnext a:hover { border-color: var(--navy); }
+.prevnext .dir { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted-2); text-transform: uppercase; }
+.prevnext .nx { text-align: right; }
+
+/* ---------- Cards / arquivos ---------- */
+.card-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin: 1.4em 0; }
+.card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); padding: 18px; text-decoration: none; color: inherit; transition: all .14s; }
+.card:hover { border-color: var(--navy); transform: translateY(-2px); box-shadow: 0 10px 26px -16px rgba(22,54,92,.4); }
+.card .k { font-family: var(--font-mono); font-size: 0.72rem; color: var(--gold); text-transform: uppercase; letter-spacing: .05em; font-weight: 600; }
+.card h3 { margin: 6px 0 4px; }
+.card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.file-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); padding: 14px 18px; margin: 10px 0; }
+.file-row .fname { font-family: var(--font-mono); font-weight: 600; color: var(--navy-deep); }
+.file-row .fdesc { color: var(--muted); font-size: 0.9rem; flex: 1; min-width: 160px; }
+.file-row .dl { margin-left: auto; }
+
+/* ---------- Agenda timeline (home) ---------- */
+.agenda { list-style: none; padding: 0; margin: 1.2em 0; border-left: 2px solid var(--line); }
+.agenda li { position: relative; padding: 8px 0 8px 22px; display: flex; gap: 12px; align-items: baseline; }
+.agenda li::before { content: ""; position: absolute; left: -6px; top: 16px; width: 10px; height: 10px; border-radius: 999px; background: var(--gold); border: 2px solid var(--paper); }
+.agenda .ag-num { font-family: var(--font-mono); color: var(--navy); font-weight: 700; min-width: 26px; }
+.agenda .ag-t { flex: 1; }
+.agenda .ag-d { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted-2); }
+
+/* ---------- Footer ---------- */
+footer { border-top: 1px solid var(--line); padding: 32px clamp(16px,5vw,44px); color: var(--muted-2); font-size: 0.85rem; }
+footer .wrap { display: flex; flex-direction: column; gap: 10px; }
+footer .flinks { display: flex; gap: 16px; flex-wrap: wrap; }
+footer .flinks a { color: var(--muted); text-decoration: none; }
+footer .flinks a:hover { color: var(--navy); }
+
+@media (max-width: 640px) {
+  body { font-size: 16px; }
+  .topnav a { padding: 6px 9px; font-size: 0.84rem; }
+  .mod-number { font-size: 1.8rem; }
+}
+
+/* ---- layout de arquivo único ---- */
+.app { display: grid; grid-template-columns: 300px minmax(0,1fr); align-items: start; }
+.sidebar { position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  border-right: 1px solid var(--line); background: color-mix(in srgb,var(--paper) 70%,#fff); }
+.side-inner { padding: 22px 18px 40px; }
+.sidebar .brand { display: block; margin-bottom: 14px; }
+.sidebar .brand .mark { font-family: var(--font-display); font-weight: 600; font-size: 1.1rem; color: var(--navy); }
+.toc { display: flex; flex-direction: column; gap: 1px; margin-top: 10px; }
+.toc-act { font-family: var(--font-mono); font-size: .64rem; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--gold); font-weight: 700; margin: 14px 0 4px; }
+.toc-link { text-decoration: none; color: var(--muted); font-size: .9rem; padding: 5px 8px;
+  border-radius: 8px; transition: background .12s, color .12s; }
+.toc-link:hover { background: var(--navy-soft); color: var(--navy); }
+.toc-link.active { background: var(--navy); color: #fff; }
+.toc-mod { display: flex; align-items: center; gap: 7px; }
+.toc-num { font-family: var(--font-mono); font-weight: 700; color: var(--gold); font-size: .8rem; }
+.toc-link.active .toc-num { color: #fff; }
+.toc-check { width: 15px; height: 15px; border-radius: 999px; border: 1.5px solid var(--line);
+  display: inline-grid; place-items: center; font-size: .6rem; color: transparent; flex-shrink: 0; }
+.toc-mod.done .toc-check { background: var(--ok); border-color: var(--ok); color: #fff; }
+.toc-mod.done { color: var(--muted-2); }
+.content { padding: 0 clamp(18px,5vw,64px); max-width: 860px; }
+.doc-section { padding: 46px 0 30px; border-bottom: 1px solid var(--line-soft); scroll-margin-top: 18px; }
+.doc-section:last-child { border-bottom: 0; }
+.hero-section h1 { font-size: clamp(2.4rem,6vw,3.6rem); }
+.topbar-single { display: none; }
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+  .side-inner { padding: 16px clamp(16px,5vw,40px); }
+  .toc { display: grid; grid-template-columns: 1fr 1fr; }
+  .toc-act { grid-column: 1 / -1; }
+}
+@media print {
+  .sidebar { display: none; }
+  .app { display: block; }
+  .doc-section { page-break-inside: avoid; }
+  details.box { border: 1px solid #ccc; } details.box .box-body { display: block !important; }
+}
+/* ---- selo de público + nota do facilitador ---- */
+.side-badge { display: inline-block; font-family: var(--font-mono); font-size: .62rem;
+  text-transform: uppercase; letter-spacing: .08em; font-weight: 700; padding: 2px 9px;
+  border-radius: 999px; margin-bottom: 14px; background: var(--gold); color: #fff; }
+.side-badge.aluno { background: var(--navy); }
+.facnote { border: 1px solid var(--navy); border-left: 4px solid var(--navy);
+  background: var(--navy-soft); border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 14px 18px; margin: 1.4em 0; color: var(--ink-soft); }
+.facnote .label { font-family: var(--font-mono); font-size: .68rem; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--navy); display: block; margin-bottom: 5px; font-weight: 700; }
+.facnote ol { margin: .4em 0; }
+@media print { .facnote { border-color: #888; background: #f0f0f0; } }
+</style></head><body><div class="app"><aside class="sidebar"><div class="side-inner"><a class="brand" href="#inicio"><span class="mark">Dominando o NotebookLM</span></a><span class="side-badge">Facilitador</span><div class="progress-bar"><span data-progress-fill></span></div><p class="progress-text" data-progress-text>0 de 13 módulos</p><nav class="toc"><a class="toc-link" href="#inicio">Início</a><a class="toc-link" href="#guia-facilitador">Guia do facilitador</a><div class="toc-act">Ato I — Fundamentos</div><a class="toc-link toc-mod" data-toc="00" href="#modulo-00"><span class="toc-check">✓</span><span class="toc-num">00</span>Abertura</a><a class="toc-link toc-mod" data-toc="01" href="#modulo-01"><span class="toc-check">✓</span><span class="toc-num">01</span>Conhecendo o NotebookLM</a><a class="toc-link toc-mod" data-toc="02" href="#modulo-02"><span class="toc-check">✓</span><span class="toc-num">02</span>Fundamentos sem jargão</a><a class="toc-link toc-mod" data-toc="03" href="#modulo-03"><span class="toc-check">✓</span><span class="toc-num">03</span>Montar seu primeiro notebook</a><div class="toc-act">Ato II — O trabalho com o NotebookLM</div><a class="toc-link toc-mod" data-toc="04" href="#modulo-04"><span class="toc-check">✓</span><span class="toc-num">04</span>Perguntar com citações</a><a class="toc-link toc-mod" data-toc="05" href="#modulo-05"><span class="toc-check">✓</span><span class="toc-num">05</span>Briefing, FAQ e linha do tempo</a><a class="toc-link toc-mod" data-toc="06" href="#modulo-06"><span class="toc-check">✓</span><span class="toc-num">06</span>Audio Overview</a><a class="toc-link toc-mod" data-toc="07" href="#modulo-07"><span class="toc-check">✓</span><span class="toc-num">07</span>Mapa mental &amp; descoberta</a><a class="toc-link toc-mod" data-toc="08" href="#modulo-08"><span class="toc-check">✓</span><span class="toc-num">08</span>Do notebook ao entregável</a><div class="toc-act">Ato III — Ir além e governar</div><a class="toc-link toc-mod" data-toc="09" href="#modulo-09"><span class="toc-check">✓</span><span class="toc-num">09</span>Base de conhecimento do time</a><a class="toc-link toc-mod" data-toc="10" href="#modulo-10"><span class="toc-check">✓</span><span class="toc-num">10</span>NotebookLM × Claude</a><a class="toc-link toc-mod" data-toc="11" href="#modulo-11"><span class="toc-check">✓</span><span class="toc-num">11</span>Riscos e governança</a><a class="toc-link toc-mod" data-toc="12" href="#modulo-12"><span class="toc-check">✓</span><span class="toc-num">12</span>Plano 30-60-90 e fechamento</a><div class="toc-act">Apoio</div><a class="toc-link" href="#dicas">Dicas</a><a class="toc-link" href="#recursos">Recursos</a><a class="toc-link" href="#referencia">Referência</a></nav></div></aside><div class="content"><section id="inicio" class="doc-section hero-section"><div class="kicker">Programa Executivo</div><h1>Dominando o <span style='color:var(--gold);font-style:italic'>NotebookLM</span></h1><p class="lede">A ferramenta do Google que lê a SUA pilha de documentos e responde ancorada nas fontes, com citações verificáveis. Para o executivo: digerir relatórios em minutos, gerar briefings, ouvir um “podcast” das suas leituras e confiar mais na resposta. Fio condutor: as fontes da <strong>Aurora S.A.</strong> (as mesmas da trilha de Claude). Documento único — navegue pela barra lateral; seu progresso fica salvo neste navegador.</p><a class="btn" href="#modulo-00">Começar pelo Módulo 00 →</a> <a class="btn ghost" href="#dicas">Ver as dicas</a><div class="callout warn"><span class="label">A regra de hoje</span>Use fontes públicas ou fictícias. Nunca suba dados pessoais (LGPD) ou confidenciais em ferramentas que a empresa ainda não aprovou.</div><h2>O que você será capaz de fazer</h2><table class="t"><thead><tr><th>Ao final, cada participante consegue…</th><th></th></tr></thead><tbody><tr><td>Montar um notebook das suas fontes</td><td>relatórios, transcrições, web, áudio.</td></tr><tr><td>Perguntar com citações</td><td>respostas ancoradas e verificáveis em um clique.</td></tr><tr><td>Gerar briefings, FAQ e linha do tempo</td><td>o essencial das fontes, pronto para a reunião.</td></tr><tr><td>Criar um Audio Overview</td><td>ouvir um resumo das fontes no trajeto.</td></tr><tr><td>Compartilhar como base do time</td><td>todos perguntam às mesmas fontes.</td></tr><tr><td>Combinar com o Claude e governar</td><td>entender → produzir; com cuidado de LGPD.</td></tr></tbody></table><h2>A jornada</h2><ul class="agenda"><li><span class="ag-num">00</span><span class="ag-t"><a href="#modulo-00" style="text-decoration:none;color:inherit">Abertura</a></span></li><li><span class="ag-num">01</span><span class="ag-t"><a href="#modulo-01" style="text-decoration:none;color:inherit">Conhecendo o NotebookLM</a></span></li><li><span class="ag-num">02</span><span class="ag-t"><a href="#modulo-02" style="text-decoration:none;color:inherit">Fundamentos sem jargão</a></span></li><li><span class="ag-num">03</span><span class="ag-t"><a href="#modulo-03" style="text-decoration:none;color:inherit">Montar seu primeiro notebook</a></span></li><li><span class="ag-num">04</span><span class="ag-t"><a href="#modulo-04" style="text-decoration:none;color:inherit">Perguntar com citações</a></span></li><li><span class="ag-num">05</span><span class="ag-t"><a href="#modulo-05" style="text-decoration:none;color:inherit">Briefing, FAQ e linha do tempo</a></span></li><li><span class="ag-num">06</span><span class="ag-t"><a href="#modulo-06" style="text-decoration:none;color:inherit">Audio Overview</a></span></li><li><span class="ag-num">07</span><span class="ag-t"><a href="#modulo-07" style="text-decoration:none;color:inherit">Mapa mental &amp; descoberta</a> <span style="font-family:var(--font-mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.05em;color:var(--gold)">· aprof.</span></span></li><li><span class="ag-num">08</span><span class="ag-t"><a href="#modulo-08" style="text-decoration:none;color:inherit">Do notebook ao entregável</a></span></li><li><span class="ag-num">09</span><span class="ag-t"><a href="#modulo-09" style="text-decoration:none;color:inherit">Base de conhecimento do time</a> <span style="font-family:var(--font-mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.05em;color:var(--gold)">· aprof.</span></span></li><li><span class="ag-num">10</span><span class="ag-t"><a href="#modulo-10" style="text-decoration:none;color:inherit">NotebookLM × Claude</a></span></li><li><span class="ag-num">11</span><span class="ag-t"><a href="#modulo-11" style="text-decoration:none;color:inherit">Riscos e governança</a></span></li><li><span class="ag-num">12</span><span class="ag-t"><a href="#modulo-12" style="text-decoration:none;color:inherit">Plano 30-60-90 e fechamento</a></span></li></ul><p><span style='color:var(--muted)'>O núcleo (módulos sem o selo <em>aprofundamento</em>) é a espinha dorsal; os aprofundamentos estendem o programa e funcionam como sessões separadas ou consulta.</span></p></section><section id="guia-facilitador" class="doc-section"><h1>Guia do facilitador</h1><p>Esta versão é o roteiro de condução. Os blocos <strong>Nota do facilitador</strong> aparecem ao longo dos módulos com ênfases e momentos de demonstração ao vivo.</p><div class="callout warn"><span class="label">Regra de ouro do dia</span>Use fontes públicas ou fictícias. Reforce a regra na abertura e de novo na governança: nunca subir dados pessoais (LGPD) ou confidenciais em ferramentas não aprovadas.</div><h2>Antes de começar (setup)</h2><p>Garanta que cada participante tenha: acesso ao NotebookLM (login feito) e os arquivos do caso Aurora baixados para subir como fontes. Tenha projetor para demonstrar o Audio Overview ao vivo.</p><h2>Princípios de facilitação</h2><table class="t"><thead><tr><th>Situação</th><th>Como conduzir</th></tr></thead><tbody><tr><td>O cético</td><td>Faça a demo do “não encontrei nas fontes” e mostre as citações. Confiança vem de ver a origem.</td></tr><tr><td>O entusiasta</td><td>Desafie a conferir uma citação que embasa mal uma conclusão. O grounding ajuda, não substitui o julgamento.</td></tr><tr><td>Fluências distintas</td><td>Trabalhe em pares e circule pela sala.</td></tr><tr><td>O ritual do debrief</td><td>Após cada exercício: “O que economizou tempo?” e “Você conferiu a citação?”.</td></tr></tbody></table><h2>Sequência sugerida (núcleo)</h2><p>Abertura · Conhecendo o NotebookLM · Fundamentos · Montar o notebook · Perguntar com citações · Briefing/FAQ/Timeline · Audio Overview · Do notebook ao entregável · NotebookLM × Claude · Governança · Plano. Os aprofundamentos (Mapa mental, Base de conhecimento do time) ficam bem como sessões à parte. Priorize a mão na massa — principalmente o Audio Overview ao vivo.</p><div class="callout"><span class="label">Materiais</span>As fontes da Aurora, a biblioteca de perguntas, o guia de montagem e o checklist de governança estão na seção Recursos.</div></section><section id="modulo-00" class="doc-section"><div class="meta-pill">Ato I · Módulo 00</div><div class="mod-number">00</div><h1>Abertura</h1><p class="subtitle">Por que o NotebookLM é diferente</p><p>Objetivo: entender por que o NotebookLM é uma ferramenta diferente — e por que isso importa para quem decide com base em muito documento.</p><h2>Um analista que só lê o que VOCÊ deu</h2><p>Um chatbot genérico responde a partir de tudo o que viu na internet — e às vezes inventa. O <strong>NotebookLM</strong> é o oposto: ele responde <strong>ancorado nas fontes que você sobe</strong> (seus relatórios, contratos, transcrições) e mostra <strong>de onde tirou cada frase</strong>. É um analista que leu a sua pilha de documentos — e cita a página.</p><div class="callout gold"><span class="label">A ideia central</span>Para um executivo, isso resolve duas dores de uma vez: <strong>ler rápido</strong> uma montanha de material e <strong>confiar mais</strong> na resposta, porque cada afirmação vem com a citação para conferir.</div><h2>O caso de hoje: a Aurora S.A.</h2><p>Vamos usar as mesmas fontes <strong>fictícias</strong> da <span class="term">Aurora S.A.<span class="tip"><strong>Aurora</strong>Aurora S.A. (fictícia) — a empresa do caso: varejo de bens de consumo, lojas + e-commerce, receita ~R$ 4,2 bi, crescimento desacelerando e um concorrente digital ganhando share. As mesmas fontes da trilha Claude.</span></span> — uma varejista de bens de consumo com crescimento desacelerando e um concorrente digital ganhando share. Você vai jogar o release, a transcrição da call, o panorama de mercado e os concorrentes num <span class="term">notebook<span class="tip"><strong>Notebook</strong>Um caderno: um conjunto de fontes sobre um tema, mais o chat e os resumos gerados a partir delas. Você pode ter vários — um por projeto, time ou decisão.</span></span> e fazer o NotebookLM ler tudo por você.</p><div class="callout gold"><span class="label">Frase para fixar</span>“Não estou aprendendo uma ferramenta. Estou aprendendo a ler uma pilha de documentos em minutos — e a confiar na resposta porque ela vem citada.”</div><div class="facnote"><span class="label">Nota do facilitador</span><p>Abra com a pergunta: “Quanto tempo do seu time é gasto lendo relatórios antes de decidir — e quanto você confia no resumo de outra pessoa?”. Posicione o NotebookLM como o analista que leu tudo e cita a página. Apresente as fontes da Aurora e a regra do dado fictício.</p></div><div class="done-bar" data-done-bar><span class="grow">Terminou este módulo? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn data-mod="00" type="button">Marcar como concluído</button></div></section><section id="modulo-01" class="doc-section"><div class="meta-pill">Ato I · Módulo 01</div><div class="mod-number">01</div><h1>Conhecendo o NotebookLM</h1><p class="subtitle">O que é, o que aceita como fonte</p><p>O que é, o que aceita e como difere de um chatbot comum.</p><h2>O que é o NotebookLM</h2><p>É uma ferramenta do Google para <strong>pesquisar e raciocinar sobre as suas próprias fontes</strong>. Você cria um <span class="term">notebook<span class="tip"><strong>Notebook</strong>Um caderno: um conjunto de fontes sobre um tema, mais o chat e os resumos gerados a partir delas. Você pode ter vários — um por projeto, time ou decisão.</span></span>, adiciona documentos e passa a conversar com eles: perguntar, resumir, comparar — sempre com <span class="term">citações<span class="tip"><strong>Citação</strong>O número clicável ao lado de cada frase da resposta: leva direto ao trecho da fonte que embasou aquilo. É o que torna a resposta verificável em segundos.</span></span> que apontam para o trecho de origem.</p><h2>O que serve de fonte</h2><table class="t"><thead><tr><th>Tipo de fonte</th><th>Exemplos</th></tr></thead><tbody><tr><td>Documentos</td><td>PDF, Google Docs e Slides, texto, Markdown.</td></tr><tr><td>Planilhas</td><td>Google Sheets / tabelas (suporte varia — confirme o vigente).</td></tr><tr><td>Web e vídeo</td><td>Páginas web e vídeos do YouTube (pela URL).</td></tr><tr><td>Áudio e texto colado</td><td>Gravações e trechos que você cola direto.</td></tr></tbody></table><div class="callout"><span class="label">Limites</span>Há um limite de fontes por notebook (e de tamanho por fonte), que varia entre o plano gratuito e o <span class="term">NotebookLM Plus<span class="tip"><strong>NotebookLM Plus</strong>A versão paga/corporativa (via Google Workspace ou plano premium): mais fontes e áudios, compartilhamento e controles de administração. Confirme limites e disponibilidade atuais.</span></span>. Confirme os números atuais — eles mudam.</div><h2>Como difere de um chatbot comum</h2><table class="t"><thead><tr><th>Chatbot genérico</th><th>NotebookLM</th></tr></thead><tbody><tr><td>Responde do conhecimento geral da internet</td><td>Responde só das fontes que você deu</td></tr><tr><td>Pode inventar e raramente cita</td><td>Mostra a citação para cada afirmação</td></tr><tr><td>Ótimo para criar e conversar amplo</td><td>Ótimo para entender um corpo de documentos com confiança</td></tr></tbody></table><div class="done-bar" data-done-bar><span class="grow">Terminou este módulo? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn data-mod="01" type="button">Marcar como concluído</button></div></section><section id="modulo-02" class="doc-section"><div class="meta-pill">Ato I · Módulo 02</div><div class="mod-number">02</div><h1>Fundamentos sem jargão</h1><p class="subtitle">As três verdades que mudam o uso</p><p>Três verdades que mudam o jeito de usar.</p><p><strong>1. Ele é <span class="term">ancorado nas suas fontes<span class="tip"><strong>Ancoragem</strong>O NotebookLM responde apoiado SÓ nas suas fontes (não na internet aberta) e mostra de onde tirou cada afirmação. Isso reduz muito a alucinação — mas ainda confira a citação.</span></span>.</strong> Não busca na internet aberta: responde do que você subiu — e cita. Por isso é confiável para “o que os <em>meus</em> documentos dizem”.</p><p><strong>2. Ele só sabe o que você deu.</strong> Faltou uma fonte, faltou a resposta. Se você perguntar algo que não está nas fontes, ele costuma dizer que não encontrou — e isso é uma <em>qualidade</em>.</p><p><strong>3. Lixo entra, lixo sai.</strong> A resposta é tão boa quanto as fontes. Curar boas fontes é metade do trabalho. E mesmo com citação, <strong>confira</strong> — a <span class="term">alucinação<span class="tip"><strong>Alucinação</strong>Quando uma IA afirma algo que soa perfeito e está errado. A ancoragem do NotebookLM reduz isso, mas não elimina — sempre confira a citação na fonte.</span></span> é rara aqui, mas não é zero.</p><div class="handson"><div class="ho-head">Mão na massa</div><h3>Exercício — pergunte o que NÃO está nas fontes</h3><p>Depois de montar o notebook (próximo módulo), faça um teste de confiança:</p><div class="prompt-label">No NotebookLM, peça</div><div class="codeblock"><pre>Qual foi o faturamento da Aurora no primeiro trimestre de 2026?</pre></div><details class="box"><summary><span class="tag">Reflexão</span> Reflexão</summary><div class="box-body"><p>As suas fontes vão só até 2025 — o NotebookLM deve dizer que <strong>não encontrou isso nas fontes</strong>, em vez de inventar. Esse “não sei” é exatamente o comportamento que você quer numa ferramenta de decisão.</p></div></details></div><div class="facnote"><span class="label">Nota do facilitador</span><p><strong>Demo de confiança.</strong> Peça algo que NÃO está nas fontes (ex.: faturamento do 1T2026). O NotebookLM deve dizer que não encontrou — destaque que esse “não sei” é exatamente o comportamento desejado numa ferramenta de decisão.</p></div><div class="done-bar" data-done-bar><span class="grow">Terminou este módulo? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn data-mod="02" type="button">Marcar como concluído</button></div></section><section id="modulo-03" class="doc-section"><div class="meta-pill">Ato I · Módulo 03</div><div class="mod-number">03</div><h1>Montar seu primeiro notebook</h1><p class="subtitle">Criar o caderno e adicionar fontes</p><p>Mãos à obra: criar um notebook e dar a ele a pilha de documentos da Aurora.</p><h2>Passo a passo</h2><table class="t"><thead><tr><th>#</th><th>Passo</th></tr></thead><tbody><tr><td>1</td><td>Abra o NotebookLM e crie um novo notebook (ex.: “Aurora — resultados 2025”).</td></tr><tr><td>2</td><td>Clique em “Adicionar fontes” e suba os arquivos abaixo (ou cole o texto).</td></tr><tr><td>3</td><td>Espere o NotebookLM ler — ele já gera um resumo inicial e sugestões.</td></tr><tr><td>4</td><td>Pronto: agora você conversa com as fontes.</td></tr></tbody></table><div class="exfiles"><span class="exfiles-label">Suba estas fontes</span><a class="filechip" data-file="Aurora_Release_Resultados.md" href="../arquivos/Aurora_Release_Resultados.md" download="Aurora_Release_Resultados.md">📎 Aurora_Release_Resultados.md <span class="dl">↓</span></a><a class="filechip" data-file="Aurora_Transcricao_Call.md" href="../arquivos/Aurora_Transcricao_Call.md" download="Aurora_Transcricao_Call.md">📎 Aurora_Transcricao_Call.md <span class="dl">↓</span></a><a class="filechip" data-file="Aurora_Mercado.md" href="../arquivos/Aurora_Mercado.md" download="Aurora_Mercado.md">📎 Aurora_Mercado.md <span class="dl">↓</span></a><a class="filechip" data-file="Aurora_Concorrentes.md" href="../arquivos/Aurora_Concorrentes.md" download="Aurora_Concorrentes.md">📎 Aurora_Concorrentes.md <span class="dl">↓</span></a></div><div class="callout tip"><span class="label">Dica de curadoria</span>Dê um nome claro ao notebook e mantenha-o focado num tema. Um notebook com fontes demais e desconexas responde pior — prefira vários cadernos bem curados.</div><details class="box"><summary><span class="tag">Reflexão</span> Reflexão</summary><div class="box-body"><p>Repare que você não “treinou” nada — só deu os documentos certos. O trabalho de valor aqui é a <strong>curadoria</strong>: quais fontes entram. Pergunte-se quais documentos você relê toda semana que mereciam virar um notebook.</p></div></details><div class="facnote"><span class="label">Nota do facilitador</span><p><strong>Curadoria.</strong> Garanta que todos subam as 4 fontes da Aurora num notebook só. Reforce: notebooks focados respondem melhor; menos e melhor > muito e disperso.</p></div><div class="done-bar" data-done-bar><span class="grow">Terminou este módulo? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn data-mod="03" type="button">Marcar como concluído</button></div></section><section id="modulo-04" class="doc-section"><div class="meta-pill">Ato II · Módulo 04</div><div class="mod-number">04</div><h1>Perguntar com citações</h1><p class="subtitle">Respostas ancoradas e verificáveis</p><p>O coração do NotebookLM: perguntar e receber respostas <strong>com <span class="term">citação<span class="tip"><strong>Citação</strong>O número clicável ao lado de cada frase da resposta: leva direto ao trecho da fonte que embasou aquilo. É o que torna a resposta verificável em segundos.</span></span></strong> — verificáveis em um clique.</p><h2>Perguntas que valem a reunião</h2><div class="prompt-label">No NotebookLM, peça</div><div class="codeblock"><pre>Resuma a situação da Aurora em 5 pontos para quem não leu nada — receita,
+margem, digital, concorrência e a decisão em pauta.</pre></div><div class="prompt-label">No NotebookLM, peça</div><div class="codeblock"><pre>O que a CEO disse sobre entrar no marketplace? Cite a fonte.</pre></div><div class="prompt-label">No NotebookLM, peça</div><div class="codeblock"><pre>Onde o release e a transcrição da call divergem ou se reforçam?</pre></div><div class="callout warn"><span class="label">Confie, mas confira</span>Toda resposta vem com números clicáveis: clique e vá ao trecho exato da fonte. <strong>Confira a citação</strong> antes de levar adiante — é rápido e é o que torna a resposta confiável.</div><details class="box"><summary><span class="tag">Reflexão</span> Reflexão</summary><div class="box-body"><p>Repare a diferença para um chatbot comum: aqui você <em>vê</em> de onde veio cada afirmação. Em vez de “será que é verdade?”, você pergunta “de qual fonte?” — e a resposta está a um clique.</p></div></details><div class="facnote"><span class="label">Nota do facilitador</span><p><strong>O ponto-chave: a citação.</strong> Faça-os clicar nos números das respostas e ir ao trecho de origem. A pergunta muda de “será verdade?” para “de qual fonte?”. Sempre conferir antes de levar adiante.</p></div><div class="done-bar" data-done-bar><span class="grow">Terminou este módulo? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn data-mod="04" type="button">Marcar como concluído</button></div></section><section id="modulo-05" class="doc-section"><div class="meta-pill">Ato II · Módulo 05</div><div class="mod-number">05</div><h1>Briefing, FAQ e linha do tempo</h1><p class="subtitle">O Notebook Guide gerado das fontes</p><p>O NotebookLM gera, sozinho, vários materiais a partir das suas fontes — o <span class="term">Notebook Guide<span class="tip"><strong>Notebook Guide</strong>O painel que o NotebookLM gera automaticamente das suas fontes: resumo, perguntas frequentes, documento de briefing, linha do tempo e índice. (Nomes e formatos variam com o tempo.)</span></span> (ou painel de Estúdio).</p><table class="t"><thead><tr><th>Material</th><th>Para que serve ao executivo</th></tr></thead><tbody><tr><td>Resumo / Briefing</td><td>Uma página com o essencial das fontes — pronta para a reunião.</td></tr><tr><td>Perguntas frequentes (FAQ)</td><td>Antecipa o que vão te perguntar no comitê.</td></tr><tr><td>Linha do tempo</td><td>Ordena os fatos — útil em casos, investigações, históricos.</td></tr><tr><td>Índice / guia de estudo</td><td>Mapa do conteúdo para navegar rápido.</td></tr></tbody></table><h2>Gere e refine</h2><div class="prompt-label">No NotebookLM, peça</div><div class="codeblock"><pre>Gere um documento de briefing das fontes da Aurora para o board, com os
+3 maiores riscos e a decisão em pauta.</pre></div><div class="prompt-label">No NotebookLM, peça <span style="color:var(--gold)">· prep de comitê</span></div><div class="codeblock"><pre>Liste as 8 perguntas mais difíceis que o board pode fazer sobre estes
+resultados — e a resposta ancorada nas fontes, com citação.</pre></div><details class="box"><summary><span class="tag">Reflexão</span> Reflexão</summary><div class="box-body"><p>Você acabou de transformar uma pilha de documentos em um briefing e um Q&A de comitê — em minutos, e tudo rastreável às fontes. Esse é o ganho diário do NotebookLM.</p></div></details><div class="done-bar" data-done-bar><span class="grow">Terminou este módulo? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn data-mod="05" type="button">Marcar como concluído</button></div></section><section id="modulo-06" class="doc-section"><div class="meta-pill">Ato II · Módulo 06</div><div class="mod-number">06</div><h1>Audio Overview</h1><p class="subtitle">O “podcast” das suas fontes</p><p>O recurso que encanta: o <strong><span class="term">Audio Overview<span class="tip"><strong>Audio Overview</strong>Um resumo em áudio, no formato de conversa entre apresentadores de IA, gerado das suas fontes — para ouvir no trajeto. Dá para focar num tema, escolher o idioma e, em alguns casos, interagir.</span></span></strong> — um “podcast” gerado das suas fontes, com dois apresentadores de IA conversando sobre o conteúdo. Para ouvir no carro, na esteira, entre reuniões.</p><h2>Gere o áudio das fontes da Aurora</h2><table class="t"><thead><tr><th>#</th><th>Passo</th></tr></thead><tbody><tr><td>1</td><td>No notebook, abra o Audio Overview (painel de Estúdio) e gere.</td></tr><tr><td>2</td><td>Personalize: foque num tema (ex.: “foque na ameaça competitiva”).</td></tr><tr><td>3</td><td>Escolha o idioma; baixe para ouvir offline; em alguns casos, entre na conversa e pergunte.</td></tr></tbody></table><div class="prompt-label">Ao personalizar o áudio, peça</div><div class="codeblock"><pre>Gere um Audio Overview das fontes da Aurora focado em: o que muda na
+estratégia digital e quais decisões o board precisa tomar. Tom executivo,
+~10 minutos.</pre></div><div class="callout"><span class="label">Também existe</span>Há também o <span class="term">Video Overview<span class="tip"><strong>Video Overview</strong>Uma versão em vídeo do resumo (narração sobre slides gerados das suas fontes). Recurso mais recente — confirme disponibilidade.</span></span> (narração sobre slides) — recurso mais recente. Confirme a disponibilidade no seu plano.</div><details class="box"><summary><span class="tag">Reflexão</span> Reflexão</summary><div class="box-body"><p>Pense no seu tempo “morto” — trajetos, espera, exercício. Um briefing que você <em>ouve</em> transforma esse tempo em preparação. Qual leitura da sua semana você ouviria no caminho?</p></div></details><div class="facnote"><span class="label">Nota do facilitador</span><p><strong>Momento UAU.</strong> Gere um Audio Overview ao vivo e mostre a personalização (focar num tema, idioma). Conecte ao dia real deles: ouvir o briefing no trajeto. Confirme a disponibilidade de Video Overview no plano.</p></div><div class="done-bar" data-done-bar><span class="grow">Terminou este módulo? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn data-mod="06" type="button">Marcar como concluído</button></div></section><section id="modulo-07" class="doc-section"><div class="meta-pill">Ato II · Módulo 07 · Aprofundamento</div><div class="mod-number">07</div><h1>Mapa mental &amp; descoberta</h1><p class="subtitle">Enxergar o todo e o que faltou perguntar</p><p>O <strong><span class="term">mapa mental<span class="tip"><strong>Mapa mental</strong>Uma visualização das ideias e conexões das suas fontes — bom para enxergar o todo e descobrir o que você não pensou em perguntar.</span></span></strong> mostra as ideias e conexões das suas fontes de forma visual — bom para enxergar o todo e <strong>descobrir o que você não pensou em perguntar</strong>.</p><h2>Explore visualmente</h2><p>Gere o mapa mental do notebook da Aurora e navegue pelos ramos (resultados, mercado, concorrência, decisão). Clique num ramo para aprofundar — o NotebookLM puxa o trecho da fonte correspondente.</p><div class="prompt-label">No NotebookLM, peça</div><div class="codeblock"><pre>A partir do mapa, o que conecta a queda de margem à estratégia digital?
+Mostre o caminho entre os temas, com citações.</pre></div><details class="box"><summary><span class="tag">Reflexão</span> Reflexão</summary><div class="box-body"><p>O valor aqui é o <strong>inesperado</strong>: um mapa revela ligações que uma lista de perguntas não revelaria. Use-o no início de um tema novo, para mapear o terreno antes de mergulhar.</p></div></details><div class="done-bar" data-done-bar><span class="grow">Terminou este módulo? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn data-mod="07" type="button">Marcar como concluído</button></div></section><section id="modulo-08" class="doc-section"><div class="meta-pill">Ato II · Módulo 08</div><div class="mod-number">08</div><h1>Do notebook ao entregável</h1><p class="subtitle">Tirar um memo e levar ao seu fluxo</p><p>Fechar o ciclo: tirar do notebook um <strong>entregável</strong> e levá-lo para onde a decisão acontece.</p><h2>Do notebook ao memo</h2><div class="prompt-label">No NotebookLM, peça</div><div class="codeblock"><pre>Com base nas fontes, escreva um memo de 1 página ao board: situação,
+3 opções para o digital com prós/contras, recomendação e riscos.
+Mantenha as citações para eu conferir.</pre></div><h2>E daí para o seu fluxo</h2><p>Copie o briefing/respostas (com as citações conferidas) e leve para onde você produz o resultado final — por exemplo, peça ao <span class="term">Claude<span class="tip"><strong>Claude</strong>O assistente de IA da Anthropic — um agente que conversa, cria arquivos, conecta sistemas e automatiza. Complementar ao NotebookLM (ver o módulo de comparação).</span></span> para transformar o briefing num <strong>deck para o board</strong> ou numa carta. O NotebookLM entende as fontes; o Claude monta o entregável e automatiza.</p><div class="callout warn"><span class="label">Antes de exportar</span>Regra de ouro ao exportar: leve adiante <strong>só o que você conferiu na citação</strong>. O grounding ajuda, mas a responsabilidade pela verdade continua sua.</div><details class="box"><summary><span class="tag">Reflexão</span> Reflexão</summary><div class="box-body"><p>Repare no encadeamento: NotebookLM para <em>entender com confiança</em> → Claude para <em>produzir e automatizar</em>. Ferramentas diferentes, fluxo único.</p></div></details><div class="done-bar" data-done-bar><span class="grow">Terminou este módulo? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn data-mod="08" type="button">Marcar como concluído</button></div></section><section id="modulo-09" class="doc-section"><div class="meta-pill">Ato III · Módulo 09 · Aprofundamento</div><div class="mod-number">09</div><h1>Base de conhecimento do time</h1><p class="subtitle">Notebooks compartilhados</p><p>Um notebook não precisa ser só seu. Compartilhado, ele vira a <strong>base de conhecimento do time</strong> — todos perguntam às mesmas fontes e recebem respostas citadas.</p><h2>A estratégia: um notebook por tema recorrente</h2><table class="t"><thead><tr><th>Notebook</th><th>Quem usa</th><th>Ganho</th></tr></thead><tbody><tr><td>“Resultados & mercado”</td><td>Diretoria</td><td>Todos consultam os mesmos números, com citação.</td></tr><tr><td>“Onboarding da área”</td><td>Novos no time</td><td>Perguntam às políticas e materiais, sem incomodar ninguém.</td></tr><tr><td>“Due diligence — alvo X”</td><td>M&A / estratégia</td><td>Toda a papelada num lugar, perguntável e rastreável.</td></tr><tr><td>“Base regulatória”</td><td>Jurídico / compliance</td><td>As normas viram um FAQ vivo, citado.</td></tr></tbody></table><div class="callout warn"><span class="label">Governança</span>Compartilhar um notebook concede acesso às fontes dentro dele. Defina quem pode ver/editar, use só fontes aprovadas e revise o acesso — governança vale também aqui (ver módulo de riscos).</div><details class="box"><summary><span class="tag">Reflexão</span> Reflexão</summary><div class="box-body"><p>Pense numa pergunta que o seu time faz repetidamente (“qual é a nossa política de X?”, “o que dizem os últimos resultados?”). Essa é a primeira candidata a virar um notebook compartilhado.</p></div></details><div class="done-bar" data-done-bar><span class="grow">Terminou este módulo? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn data-mod="09" type="button">Marcar como concluído</button></div></section><section id="modulo-10" class="doc-section"><div class="meta-pill">Ato III · Módulo 10</div><div class="mod-number">10</div><h1>NotebookLM × Claude</h1><p class="subtitle">Quando usar cada um</p><p>NotebookLM e <span class="term">Claude<span class="tip"><strong>Claude</strong>O assistente de IA da Anthropic — um agente que conversa, cria arquivos, conecta sistemas e automatiza. Complementar ao NotebookLM (ver o módulo de comparação).</span></span> não competem — se complementam. Saber quando usar cada um é meio caminho.</p><table class="t"><thead><tr><th>Use o NotebookLM quando…</th><th>Use o Claude quando…</th></tr></thead><tbody><tr><td>Quer entender um corpo de fontes fixo, com citações</td><td>Quer criar um entregável (deck, planilha, memo) ou automatizar</td></tr><tr><td>Confiança e rastreabilidade são o ponto</td><td>Precisa de um agente que conecta sistemas e executa tarefas</td></tr><tr><td>Quer um briefing ou um áudio das suas fontes</td><td>Quer iterar, gerar opções e produzir o resultado final</td></tr><tr><td>O material é uma pilha de relatórios/transcrições</td><td>O trabalho é construir, conectar e publicar</td></tr></tbody></table><div class="callout gold"><span class="label">O combo</span>O fluxo campeão para o executivo: <strong>NotebookLM</strong> para <em>entender com confiança</em> a pilha de documentos → leva o briefing conferido para o <strong>Claude</strong>, que <em>produz e automatiza</em> o entregável.</div><div class="facnote"><span class="label">Nota do facilitador</span><p>Deixe claro que <strong>não competem</strong>: NotebookLM para entender com confiança; Claude para produzir e automatizar. Mostre o fluxo combinado.</p></div><div class="done-bar" data-done-bar><span class="grow">Terminou este módulo? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn data-mod="10" type="button">Marcar como concluído</button></div></section><section id="modulo-11" class="doc-section"><div class="meta-pill">Ato III · Módulo 11</div><div class="mod-number">11</div><h1>Riscos e governança</h1><p class="subtitle">Dados, LGPD, verificação e compartilhamento</p><p>O grounding reduz a alucinação, mas governança continua sendo papel da liderança.</p><h2>Verificar mesmo com citação</h2><p>O NotebookLM cita — mas uma citação pode embasar mal uma conclusão. Antes de usar um número externamente, <strong>abra a citação e confira</strong>. A responsabilidade pela verdade continua sua.</p><h2>Dados e LGPD</h2><table class="t"><thead><tr><th>Nível</th><th>O que é</th></tr></thead><tbody><tr><td>✅ Seguro</td><td>Fontes públicas, dados fictícios, documentos internos não sensíveis aprovados.</td></tr><tr><td>⚠️ Cautela / aprovação</td><td>Dados de clientes/colaboradores, financeiros não públicos, contratos sigilosos.</td></tr><tr><td>⛔ Risco material</td><td>Qualquer dado pessoal ou confidencial num ambiente não aprovado.</td></tr></tbody></table><div class="callout warn"><span class="label">Versão corporativa</span>Em ambiente corporativo, use a versão aprovada (via Google Workspace / <span class="term">NotebookLM Plus<span class="tip"><strong>NotebookLM Plus</strong>A versão paga/corporativa (via Google Workspace ou plano premium): mais fontes e áudios, compartilhamento e controles de administração. Confirme limites e disponibilidade atuais.</span></span>), que traz controles de dados e administração. Confirme a política de uso de dados vigente — ela muda, e é tema de board.</div><h2>Compartilhamento</h2><p>Compartilhar um notebook = compartilhar as fontes dentro dele. Conceda o mínimo necessário, prefira leitura e revise acessos periodicamente.</p><div class="facnote"><span class="label">Nota do facilitador</span><p>Reforce: o grounding reduz a alucinação, mas <strong>não elimina</strong> — uma citação pode embasar mal uma conclusão. Em ambiente corporativo, usar a versão aprovada (Workspace). Compartilhar um notebook = compartilhar as fontes.</p></div><div class="done-bar" data-done-bar><span class="grow">Terminou este módulo? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn data-mod="11" type="button">Marcar como concluído</button></div></section><section id="modulo-12" class="doc-section"><div class="meta-pill">Ato III · Módulo 12</div><div class="mod-number">12</div><h1>Plano 30-60-90 e fechamento</h1><p class="subtitle">Sair daqui com compromissos</p><p>Saia daqui com três compromissos concretos.</p><table class="t"><thead><tr><th>Horizonte</th><th>Compromisso</th><th>Exemplo</th></tr></thead><tbody><tr><td>Esta semana</td><td>1 pilha de leitura para virar notebook</td><td>Os relatórios da semana antes do comitê.</td></tr><tr><td>Este mês</td><td>1 notebook compartilhado com o time</td><td>“Resultados & mercado” ou “Onboarding da área”.</td></tr><tr><td>Este trimestre</td><td>1 hábito novo</td><td>Ouvir o Audio Overview das leituras no trajeto; política de dados definida.</td></tr></tbody></table><div class="callout gold"><span class="label">Encerramento</span>NotebookLM para entender com confiança; Claude para produzir e automatizar. Junte os dois e a leitura deixa de ser gargalo.</div><p>Leve a <a href='#recursos'>biblioteca de perguntas</a> e o <a href='#referencia'>checklist de governança</a>.</p><div class="facnote"><span class="label">Nota do facilitador</span><p>Cada participante escreve três compromissos (semana / mês / trimestre). Entregue a biblioteca de perguntas e o checklist de governança (Recursos).</p></div><div class="done-bar" data-done-bar><span class="grow">Terminou este módulo? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn data-mod="12" type="button">Marcar como concluído</button></div></section><section id="dicas" class="doc-section"><h1>Como tirar o máximo do NotebookLM</h1><p class="lede">Uma colinha de princípios. Vale para qualquer notebook — volte aqui sempre que precisar.</p><ol class="tips"><li><span class="tip-t">Cure boas fontes.</span><span class="tip-s">A resposta é tão boa quanto as fontes — escolha bem o que entra.</span></li><li><span class="tip-t">Um notebook por tema.</span><span class="tip-s">Não misture assuntos: cadernos focados respondem melhor.</span></li><li><span class="tip-t">Pergunte e clique na citação.</span><span class="tip-s">Sempre confira o trecho de origem antes de usar.</span></li><li><span class="tip-t">Use o Notebook Guide.</span><span class="tip-s">Briefing, FAQ e linha do tempo já vêm prontos — comece por eles.</span></li><li><span class="tip-t">Gere um Audio Overview.</span><span class="tip-s">Ouça um resumo das suas fontes no trajeto; personalize o foco.</span></li><li><span class="tip-t">Pergunte o que falta.</span><span class="tip-s">“Onde as fontes divergem?”, “o que está faltando aqui?”.</span></li><li><span class="tip-t">Comece pelo mapa mental em tema novo.</span><span class="tip-s">Veja o todo antes de mergulhar nas perguntas.</span></li><li><span class="tip-t">“Não encontrei” é qualidade.</span><span class="tip-s">Se faltou resposta, falta uma fonte — adicione-a.</span></li><li><span class="tip-t">Compartilhe para virar base do time.</span><span class="tip-s">Um notebook por decisão recorrente, com acesso controlado.</span></li><li><span class="tip-t">Leve o briefing conferido ao Claude.</span><span class="tip-s">NotebookLM entende; Claude produz e automatiza.</span></li></ol><div class="callout gold"><span class="label">Resumo em uma frase</span>Cure boas fontes, pergunte com citação e confira, use o Guide e o áudio, e leve o briefing conferido para onde a decisão acontece.</div><h2>Onde isto aparece no curso</h2><table class="t"><thead><tr><th>Dica</th><th>Onde praticar</th></tr></thead><tbody><tr><td>Cure fontes · um notebook por tema (1, 2)</td><td>Módulo 03 — montar o notebook</td></tr><tr><td>Pergunte e confira a citação (3, 6)</td><td>Módulo 04 — perguntar com citações</td></tr><tr><td>Notebook Guide e Audio (4, 5)</td><td>Módulos 05 e 06</td></tr><tr><td>Mapa mental · “não encontrei” (7, 8)</td><td>Módulos 07 e 02</td></tr><tr><td>Compartilhe · leve ao Claude (9, 10)</td><td>Módulos 09, 08 e 10</td></tr></tbody></table></section><section id="recursos" class="doc-section"><h1>Recursos para levar</h1><p class="lede">As fontes do caso Aurora (para subir no seu notebook) e os materiais do programa — embutidos neste documento.</p><h2>Fontes do caso Aurora (suba no notebook)</h2><div class="file-row"><span class="fname">Aurora_Release_Resultados.md</span><span class="fdesc">Release de resultados da Aurora. Fonte principal.</span><a class="btn ghost dl" data-file="Aurora_Release_Resultados.md" href="#" download="Aurora_Release_Resultados.md">Baixar ↓</a></div><div class="file-row"><span class="fname">Aurora_Transcricao_Call.md</span><span class="fdesc">Transcrição da teleconferência — ótima para perguntas e áudio.</span><a class="btn ghost dl" data-file="Aurora_Transcricao_Call.md" href="#" download="Aurora_Transcricao_Call.md">Baixar ↓</a></div><div class="file-row"><span class="fname">Aurora_Mercado.md</span><span class="fdesc">Panorama de mercado. Fonte de contexto.</span><a class="btn ghost dl" data-file="Aurora_Mercado.md" href="#" download="Aurora_Mercado.md">Baixar ↓</a></div><div class="file-row"><span class="fname">Aurora_Concorrentes.md</span><span class="fdesc">Perfis dos concorrentes. Fonte de contexto.</span><a class="btn ghost dl" data-file="Aurora_Concorrentes.md" href="#" download="Aurora_Concorrentes.md">Baixar ↓</a></div><h2>Materiais do programa</h2><div class="file-row"><span class="fname">biblioteca-de-perguntas.md</span><span class="fdesc">Perguntas prontas para fazer a um notebook executivo.</span><a class="btn ghost dl" data-file="biblioteca-de-perguntas.md" href="#" download="biblioteca-de-perguntas.md">Baixar ↓</a></div><div class="file-row"><span class="fname">guia-montar-notebook.md</span><span class="fdesc">Passo a passo para montar um bom notebook.</span><a class="btn ghost dl" data-file="guia-montar-notebook.md" href="#" download="guia-montar-notebook.md">Baixar ↓</a></div><div class="file-row"><span class="fname">checklist-governanca-notebooklm.md</span><span class="fdesc">Checklist de governança para uso do NotebookLM.</span><a class="btn ghost dl" data-file="checklist-governanca-notebooklm.md" href="#" download="checklist-governanca-notebooklm.md">Baixar ↓</a></div></section><section id="referencia" class="doc-section"><h1>Referência</h1><p class="lede">Apêndices: o caso Aurora, os tipos de fonte, NotebookLM × Claude, governança e onde confirmar o que está vigente.</p><details class="box"><summary><span class="tag">Caso</span> Apêndice A — O caso Aurora S.A.</summary><div class="box-body"><p>Empresa e números <strong>fictícios</strong>. <span class="term">Aurora S.A.<span class="tip"><strong>Aurora</strong>Aurora S.A. (fictícia) — a empresa do caso: varejo de bens de consumo, lojas + e-commerce, receita ~R$ 4,2 bi, crescimento desacelerando e um concorrente digital ganhando share. As mesmas fontes da trilha Claude.</span></span>: varejo de bens de consumo, lojas + e-commerce, receita ~R$ 4,1 bi, crescimento desacelerando, margem sob pressão e o MercadoVivo (digital) ganhando share. As fontes são o release, a transcrição da call, o panorama de mercado e os concorrentes.</p></div></details><details class="box"><summary><span class="tag">Fontes</span> Apêndice B — Tipos de fonte aceitos</summary><div class="box-body"><table class="t"><thead><tr><th>Categoria</th><th>Exemplos</th></tr></thead><tbody><tr><td>Documentos</td><td>PDF, Google Docs/Slides, texto, Markdown.</td></tr><tr><td>Planilhas</td><td>Google Sheets / tabelas (suporte varia).</td></tr><tr><td>Web e vídeo</td><td>URLs de páginas e do YouTube.</td></tr><tr><td>Áudio e texto</td><td>Gravações e texto colado.</td></tr></tbody></table><div class="callout"><span class="label">Limites</span>Há limites de número e tamanho de fontes que mudam por plano. Confirme os atuais.</div></div></details><details class="box"><summary><span class="tag">Comparação</span> Apêndice C — NotebookLM × Claude</summary><div class="box-body"><table class="t"><thead><tr><th>NotebookLM</th><th>Claude</th></tr></thead><tbody><tr><td>Entende um corpo de fontes, com citações</td><td>Cria entregáveis e automatiza</td></tr><tr><td>Briefing, FAQ, áudio das fontes</td><td>Decks, planilhas, memos, conexões</td></tr><tr><td>Confiança e rastreabilidade</td><td>Ação e produção</td></tr></tbody></table><p>Fluxo: NotebookLM para entender → Claude para produzir.</p></div></details><details class="box"><summary><span class="tag">Governança</span> Apêndice D — Governança</summary><div class="box-body"><p>Só fontes aprovadas; verificar a citação mesmo com grounding; em ambiente corporativo usar a versão aprovada; compartilhar = compartilhar as fontes. Baixe o checklist completo em Recursos.</p></div></details><details class="box"><summary><span class="tag">Verificar</span> Apêndice E — Onde verificar</summary><div class="box-body"><p>O NotebookLM evolui rápido: fontes aceitas, Audio/Video Overview, limites, planos e política de dados mudam. Antes de aplicar, confirme na documentação oficial do Google e na política interna da sua organização.</p></div></details></section><footer><div class="wrap"><p>Caso fictício Aurora S.A. — empresa e números são ilustrativos, criados apenas para o treinamento. Regra do dia: use fontes públicas ou fictícias; nunca suba dados pessoais (LGPD) ou confidenciais em ferramentas que a empresa ainda não aprovou.</p><p>O NotebookLM evolui rápido (fontes aceitas, Audio/Video Overview, limites, planos, política de dados). Antes de aplicar, confirme o que está vigente nas fontes oficiais do Google e na política interna de IA e LGPD da sua organização (ver Referência).</p><p style="font-size:.8rem">Documento único · programa hands-on · todos os dados do caso são fictícios.</p></div></footer></div></div><script>window.TRAINING_FILES={"Aurora_Release_Resultados.md":"data:text/markdown;base64,IyBBdXJvcmEgUy5BLiDigJQgUmVsZWFzZSBkZSBSZXN1bHRhZG9zIDIwMjUgKENBU08gRklDVMONQ0lPKQoKPiAqKkFWSVNPOioqIERvY3VtZW50byAqKmZpY3TDrWNpbyoqLCBjcmlhZG8gZXhjbHVzaXZhbWVudGUgcGFyYSB0cmVpbmFtZW50by4gRW1wcmVzYSwgbsO6bWVyb3MgZSBmYXRvcyAqKm7Do28gc8OjbyByZWFpcyoqLiBVc2UtbyBwYXJhIG9zIGV4ZXJjw61jaW9zIGRlIGxlaXR1cmEgZGUgcmVsYXTDs3JpbyBlIGRlIGdlcmHDp8OjbyBkZSBhcHJlc2VudGHDp8Ojby4KCioqQXVyb3JhIFMuQS4qKiDigJQgdmFyZWpvIGRlIGJlbnMgZGUgY29uc3VtbyAoZWxldHLDtG5pY29zLCBjYXNhIGUgZXN0aWxvIGRlIHZpZGEpLCBjb20gbG9qYXMgZsOtc2ljYXMgZSBlLWNvbW1lcmNlLiBTZWRlIGVtIFPDo28gUGF1bG8uIH45LjgwMCBjb2xhYm9yYWRvcmVzOyAyMTQgbG9qYXMgZW0gMTggZXN0YWRvcy4KCiMjIERlc3RhcXVlcyBkbyBhbm8KLSAqKlJlY2VpdGEgbMOtcXVpZGEgZGUgUiQgNCwwOTUgYmlsaMO1ZXMqKiwgcHJhdGljYW1lbnRlIGVzdMOhdmVsIHZzLiAyMDI0ICgrMCw0JSkuCi0gKipDcmVzY2ltZW50byBkZXNhY2VsZXJvdSBhbyBsb25nbyBkbyBhbm8qKiBlIGZpY291ICoqbmVnYXRpdm8gbm8gMsK6IHNlbWVzdHJlKiogKGRlICsxMiUgbm8gMVQyNCBwYXJhIOKIkjEsNyUgbm8gNFQyNSkuCi0gKipNYXJnZW0gYnJ1dGEgY2FpdSoqIGRlIH4zNCUgcGFyYSB+MzAsNSUsIHByZXNzaW9uYWRhIHBvciBwcm9tb8Onw7VlcyBlIG1peC4KLSAqKkVCSVREQSBkZSBSJCAzNDUgbWlsaMO1ZXMqKiAobWFyZ2VtIH44LDQlKTsgKipsdWNybyBsw61xdWlkbyBkZSBSJCAxMDUgbWlsaMO1ZXMqKi4KLSAqKkUtY29tbWVyY2UgY3Jlc2NldSB+MjAlKiogZSBqw6EgcmVzcG9uZGUgcG9yICoqfjI0JSBkYSByZWNlaXRhKiog4oCUIG8gbW90b3IgcXVlIHNlZ3VyYSBvIHJlc3VsdGFkby4KLSBBcyAqKmxvamFzIGbDrXNpY2FzIHJlY3VhcmFtKiogKOKIkjIlIGEg4oiSMyUgbmFzIHJlZ2nDtWVzIG1hZHVyYXMpLgoKIyMgQ29tZW50w6FyaW8gZGEgZ2VzdMOjbwpPIGFubyBmb2kgZGUgdHJhbnNpw6fDo28uIE8gY2xpZW50ZSBtaWdyb3UgcGFyYSBvIGRpZ2l0YWwgbWFpcyByw6FwaWRvIGRvIHF1ZSBhIEF1cm9yYSBzZSBtb3ZldSwgZSB1bSBjb25jb3JyZW50ZSBuYXRpdm8gZGlnaXRhbCAoKipNZXJjYWRvVml2byoqKSBnYW5ob3UgcGFydGljaXBhw6fDo28gYWdyZXNzaXZhbWVudGUsIGNvbXByaW1pbmRvIHByZcOnb3MuIEEgQXVyb3JhIG1hbnTDqW0gKipsaWRlcmFuw6dhIGhpc3TDs3JpY2EgZW0gQ2FzYSAmIERlY29yYcOnw6NvKiogZSBtYXJjYSBmb3J0ZSwgbWFzICoqY2hlZ291IGF0cmFzYWRhIGFvIG1hcmtldHBsYWNlKiosIG9uZGUgdGVtIGFwZW5hcyB+MSw4JSBkZSBzaGFyZSBudW0gc2VnbWVudG8gcXVlIGNyZXNjZSB+MTQlIGFvIGFuby4KCiMjIFByaW9yaWRhZGVzIHBhcmEgbyBwcsOzeGltbyBhbm8KMS4gKipBY2VsZXJhciBvIGRpZ2l0YWwqKjogZS1jb21tZXJjZSBwcsOzcHJpbyBlIGVudHJhZGEgZW0gbWFya2V0cGxhY2UuCjIuICoqRGVmZW5kZXIgYSBtYXJnZW0qKjogcmV2aXPDo28gZGUgbWl4LCBtZW5vcyBwcm9tb8Onw6NvLCBtYXJjYSBwcsOzcHJpYS4KMy4gKipSYWNpb25hbGl6YXIgYSBtYWxoYSBkZSBsb2phcyoqOiBmZWNoYXIgbG9qYXMgZGVmaWNpdMOhcmlhcywgY29udmVydGVyIG91dHJhcyBlbSBwb250b3MgZGUgcmV0aXJhZGEuCjQuICoqRWZpY2nDqm5jaWEqKjogcmVkdXppciBkZXNwZXNhcyBlIG1lbGhvcmFyIGEgY29udmVyc8OjbyBvbmxpbmUuCgojIyBSaXNjb3MKLSBHdWVycmEgZGUgcHJlw6dvcyBubyBkaWdpdGFsIHByZXNzaW9uYSBtYXJnZW0uCi0gRW5kaXZpZGFtZW50byBlIGN1c3RvIGRlIGNhcGl0YWwgZWxldmFkb3MuCi0gRGVwZW5kw6puY2lhIGRhIHRlbXBvcmFkYSBkZSBmaW0gZGUgYW5vICg0VCBjb25jZW50cmEgfjMwJSBkYSByZWNlaXRhKS4KCi0tLQoKIyMjIFBhcmEgb3MgZXhlcmPDrWNpb3MKLSAqKlJlbGF0w7NyaW8g4oaSIGRlY2s6KiogcGXDp2EgYW8gQ2xhdWRlIHVtIGRlY2sgZGUgNuKAkzggc2xpZGVzIHBhcmEgbyBib2FyZCBjb20gb3MgZGVzdGFxdWVzLCBhIHRlbmTDqm5jaWEgZGUgcmVjZWl0YS9tYXJnZW0gZSBhcyBwcmlvcmlkYWRlcyDigJQgZW0gLnBwdHguCi0gKipCYWxhbsOnby9yZXN1bHRhZG9zOioqIGNvbWJpbmUgY29tIGFzIGFiYXMgYERSRSAyMDI1YCBlIGBCYWxhbsOnbyAyMDI1YCBkbyBgQXVyb3JhX0RhdGFSb29tLnhsc3hgLgo=","Aurora_Transcricao_Call.md":"data:text/markdown;base64,IyBBdXJvcmEgUy5BLiDigJQgVHJhbnNjcmnDp8OjbyBkYSB0ZWxlY29uZmVyw6puY2lhIGRlIHJlc3VsdGFkb3MgMjAyNSAoQ0FTTyBGSUNUw41DSU8pCgo+ICoqQVZJU086KiogRG9jdW1lbnRvICoqZmljdMOtY2lvKiosIGNyaWFkbyBwYXJhIHRyZWluYW1lbnRvLiBQZXNzb2FzLCBmYWxhcyBlIG7Dum1lcm9zICoqbsOjbyBzw6NvIHJlYWlzKiouIMOJIHVtYSBmb250ZSBpZGVhbCBwYXJhIG8gTm90ZWJvb2tMTTogcGXDp2EgcmVzdW1vcywgcGVyZ3VudGFzIGFuY29yYWRhcyBlIHVtIEF1ZGlvIE92ZXJ2aWV3LgoKKipQYXJ0aWNpcGFudGVzIChmaWN0w61jaW9zKToqKiBIZWxlbmEgUHJhZG8gKENFTyksIFJ1YmVucyBUYXZhcmVzIChDRk8pLCBlIGFuYWxpc3Rhcy4KCi0tLQoKKipPcGVyYWRvcmE6KiogQm9tIGRpYS4gSW5pY2lhbW9zIGEgdGVsZWNvbmZlcsOqbmNpYSBkZSByZXN1bHRhZG9zIGRlIDIwMjUgZGEgQXVyb3JhLiBDb20gYSBwYWxhdnJhLCBhIENFTywgSGVsZW5hIFByYWRvLgoKKipIZWxlbmEgUHJhZG8gKENFTyk6KiogT2JyaWdhZGEuIDIwMjUgZm9pIHVtIGFubyBkZSB0cmFuc2nDp8OjbyBwYXJhIGEgQXVyb3JhLiBFbmNlcnJhbW9zIGNvbSByZWNlaXRhIHByYXRpY2FtZW50ZSBlc3TDoXZlbCwgZGUgUiQgNCwxIGJpbGjDtWVzLCBtYXMgYSBoaXN0w7NyaWEgZXN0w6EgbmEgY29tcG9zacOnw6NvOiBvIGUtY29tbWVyY2UgY3Jlc2NldSBjZXJjYSBkZSAyMCUgZSBqw6Egw6kgcXVhc2UgdW0gcXVhcnRvIGRhIG5vc3NhIHJlY2VpdGEsIGVucXVhbnRvIGFzIGxvamFzIGbDrXNpY2FzIHJlY3VhcmFtIG5hcyByZWdpw7VlcyBtYWR1cmFzLiBPIGNsaWVudGUgbWlncm91IHBhcmEgbyBkaWdpdGFsIG1haXMgcsOhcGlkbyBkbyBxdWUgbsOzcyBub3MgbW92ZW1vcyDigJQgZSBmb21vcyBob25lc3RvcyBjb20gbyBib2FyZCBzb2JyZSBpc3NvLgoKQSBib2Egbm90w61jaWE6IGNvbnRpbnVhbW9zIGzDrWRlcmVzIGVtIENhc2EgJiBEZWNvcmHDp8OjbywgY29tIG1hcmNhIGZvcnRlIGUgYSBtZWxob3IgZXhwZXJpw6puY2lhIGRlIGxvamEgZG8gc2V0b3IuIEEgbm90w61jaWEgZGlmw61jaWw6IGNoZWdhbW9zIGF0cmFzYWRvcyBhbyBtYXJrZXRwbGFjZSwgb25kZSB0ZW1vcyBtZW5vcyBkZSAyJSBkZSBwYXJ0aWNpcGHDp8OjbyBudW0gc2VnbWVudG8gcXVlIGNyZXNjZSAxNCUgYW8gYW5vLiBOw6NvIGTDoSBwYXJhIGlnbm9yYXIuCgoqKlJ1YmVucyBUYXZhcmVzIChDRk8pOioqIE5vcyBuw7ptZXJvczogYSBtYXJnZW0gYnJ1dGEgY2FpdSBkZSAzNCUgcGFyYSBjZXJjYSBkZSAzMCw1JSwgcHJlc3Npb25hZGEgcG9yIHByb21vw6fDtWVzIGUgbWl4LiBPIEVCSVREQSBmb2kgZGUgUiQgMzQ1IG1pbGjDtWVzLCBtYXJnZW0gZGUgOCw0JSwgZSBvIGx1Y3JvIGzDrXF1aWRvLCBSJCAxMDUgbWlsaMO1ZXMuIEdlcmFtb3MgY2FpeGEsIG1hcyBhIGZvbGdhIGRpbWludWl1LiBSZWR1emltb3MgZGVzcGVzYXMgbm8gc2VndW5kbyBzZW1lc3RyZSBlIGlzc28gY29udGludWEgZW0gMjAyNi4KCioqSGVsZW5hIFByYWRvIChDRU8pOioqIE5vc3NhcyBwcmlvcmlkYWRlcyBwYXJhIDIwMjYgc8OjbyBxdWF0cm86IGFjZWxlcmFyIG8gZGlnaXRhbCwgaW5jbHVzaXZlIGF2YWxpYW5kbyBlbnRyYWRhIGVtIG1hcmtldHBsYWNlOyBkZWZlbmRlciBhIG1hcmdlbSBjb20gbWFyY2EgcHLDs3ByaWEgZSBtZW5vcyBwcm9tb8Onw6NvOyByYWNpb25hbGl6YXIgYSBtYWxoYSBkZSBsb2phcywgZmVjaGFuZG8gYXMgZGVmaWNpdMOhcmlhczsgZSBnYW5oYXIgZWZpY2nDqm5jaWEuIE7Do28gdmFtb3MgY3Jlc2NlciBzw7MgcG9yIGNyZXNjZXIuCgotLS0KCioqQW5hbGlzdGEgKEJhbmNvIFgpOioqIEhlbGVuYSwgc29icmUgbyBtYXJrZXRwbGFjZSDigJQgdm9jw6pzIHbDo28gY29uc3RydWlyLCBjb21wcmFyIG91IHNlIGFsaWFyPyBFIHF1YWwgbyBpbXBhY3RvIG5hIG1hcmdlbSBubyBjdXJ0byBwcmF6bz8KCioqSGVsZW5hIFByYWRvIChDRU8pOioqIEFpbmRhIGVzdGFtb3MgYXZhbGlhbmRvIGFzIHRyw6pzIHJvdGFzLiBDb25zdHJ1aXIgZG8gemVybyDDqSBsZW50bzsgY29tcHJhciDDqSBjYXJvIG5vIG1vbWVudG87IHVtYSBhbGlhbsOnYSBwb2RlIHNlciBvIGNhbWluaG8gbWFpcyByw6FwaWRvIHBhcmEgdHLDoWZlZ28uIFNlamEgcXVhbCBmb3IsIG5vIGN1cnRvIHByYXpvIGlzc28gcHJlc3Npb25hIG1hcmdlbSDigJQgZSBxdWVyZW1vcyBzZXIgdHJhbnNwYXJlbnRlczogbsOjbyB2YW1vcyBwZXJzZWd1aXIgbyBjcmVzY2ltZW50byBkbyBNZXJjYWRvVml2byBxdWVpbWFuZG8gY2FpeGEgY29tbyBlbGVzIGZhemVtLgoKKipBbmFsaXN0YSAoR2VzdG9yYSBZKToqKiBSdWJlbnMsIHF1YWwgbyBuw612ZWwgZGUgZW5kaXZpZGFtZW50byBlIG8gY29uZm9ydG8gZGUgdm9jw6pzIGNvbSBvIGN1c3RvIGRlIGNhcGl0YWwgYXR1YWw/CgoqKlJ1YmVucyBUYXZhcmVzIChDRk8pOioqIEVzdGFtb3MgY29uZm9ydMOhdmVpcywgbWFzIGF0ZW50b3MuIE8gY3VzdG8gZGUgY2FwaXRhbCBzdWJpdSBlIGlzc28gZW50cmEgbmEgY29udGEgZGUgcXVhbHF1ZXIgaW52ZXN0aW1lbnRvIG5vIGRpZ2l0YWwuIFBvciBpc3NvIGEgZGlzY2lwbGluYSBkZSBtYXJnZW0gw6kgaW5lZ29jacOhdmVsIG5lc3RlIGNpY2xvLgoKKipBbmFsaXN0YSAoQmFuY28gWik6KiogQSBsaWRlcmFuw6dhIGVtIENhc2EgJiBEZWNvcmHDp8OjbyBlc3TDoSBzb2IgYW1lYcOnYT8KCioqSGVsZW5hIFByYWRvIChDRU8pOioqIMOJIG8gbm9zc28gYXRpdm8gbWFpcyB2YWxpb3NvIGUsIHNpbSwgaMOhIGNvbmNvcnJlbnRlcyByZWdpb25haXMgZm9ydGVzIG5lc3NlIHRlcnJpdMOzcmlvLiBEZWZlbmTDqi1sbyDDqSBwcmlvcmlkYWRlIOKAlCDDqSBvbmRlIHRlbW9zIGEgbWVsaG9yIG1hcmdlbS4gUXVlbSBub3MgY29uaGVjZSBzYWJlOiBuw6NvIHZhbW9zIGVudHJlZ2FyIGVzc2UgdGVycmVuby4KCioqT3BlcmFkb3JhOioqIEVuY2VycmFtb3MgcG9yIGFxdWkuIE9icmlnYWRhIGEgdG9kb3MuCgotLS0KCiMjIyBQYXJhIG9zIGV4ZXJjw61jaW9zIChOb3RlYm9va0xNKQotIFN1YmEgZXN0YSB0cmFuc2NyacOnw6NvIGNvbW8gZm9udGUgZSBwZcOnYTogKiJyZXN1bWEgYSBjYWxsIGVtIDUgcG9udG9zIHBhcmEgcXVlbSBuw6NvIHBhcnRpY2lwb3UiKi4KLSBQZXJndW50ZSBjb20gY2l0YcOnw6NvOiAqIm8gcXVlIGEgQ0VPIGRpc3NlIHNvYnJlIGVudHJhciBubyBtYXJrZXRwbGFjZT8iKiBlIGNsaXF1ZSBuYSBjaXRhw6fDo28gcGFyYSBjb25mZXJpci4KLSBHZXJlIHVtICoqQXVkaW8gT3ZlcnZpZXcqKiBkYSBjYWxsICsgZG8gcmVsZWFzZSBwYXJhIG91dmlyIG5vIHRyYWpldG8uCg==","Aurora_Mercado.md":"data:text/markdown;base64,IyBQYW5vcmFtYSBkZSBtZXJjYWRvIOKAlCB2YXJlam8gZGUgYmVucyBkZSBjb25zdW1vIChDQVNPIEZJQ1TDjUNJTykKCj4gKipBVklTTzoqKiBEb2N1bWVudG8gKipmaWN0w61jaW8qKiwgY3JpYWRvIHBhcmEgdHJlaW5hbWVudG8uIE7Dum1lcm9zIGUgdGVuZMOqbmNpYXMgKipuw6NvIHPDo28gcmVhaXMqKi4gVXNlLW8gcGFyYSBvIGV4ZXJjw61jaW8gZGUgYW7DoWxpc2UgZGUgbWVyY2FkbyAoZSBjb21vIHBvbnRvIGRlIHBhcnRpZGEgcGFyYSB2ZXJpZmljYXIgZW0gZm9udGVzIHJlYWlzKS4KCiMjIE8gbWVyY2FkbyBlbSBxdWUgYSBBdXJvcmEgY29tcGV0ZQpPIHZhcmVqbyBkZSBiZW5zIGRlIGNvbnN1bW8gKGVsZXRyw7RuaWNvcywgY2FzYSBlIGVzdGlsbyBkZSB2aWRhKSBtb3ZpbWVudGEgY2VyY2EgZGUgKipSJCAyMjAgYmlsaMO1ZXMvYW5vKiogbm8gcmVjb3J0ZSBkYSBBdXJvcmEsIGNyZXNjZW5kbyB+NiUgYW8gYW5vIG5vIGFncmVnYWRvIOKAlCBtYXMgY29tIHZlbG9jaWRhZGVzIG11aXRvIGRpZmVyZW50ZXMgcG9yIHNlZ21lbnRvLgoKfCBTZWdtZW50byB8IFRhbWFuaG8gKFRBTSkgfCBDcmVzY2ltZW50byB8IERpbsOibWljYSB8CnwtLS18LS0tfC0tLXwtLS18CnwgRWxldHLDtG5pY29zIHwgUiQgNTggYmkgfCB+Niw1JSB8IE1hcmdlbSBiYWl4YSwgZ3VlcnJhIGRlIHByZcOnbywgY2ljbG8gZGUgdHJvY2EgbG9uZ28gfAp8IENhc2EgJiBEZWNvcmHDp8OjbyB8IFIkIDQxIGJpIHwgfjQsMCUgfCBFc3TDoXZlbDsgQXVyb3JhIMOpIGZvcnRlIGFxdWkgfAp8IEVzdGlsbyBkZSB2aWRhIHwgUiQgMzMgYmkgfCB+OCw1JSB8IENyZXNjZW50ZTsgcHV4YWRvIHBvciBtYXJjYSBlIGV4cGVyacOqbmNpYSB8CnwgTWFya2V0cGxhY2UvZGlnaXRhbCB8IFIkIDkwIGJpIHwgfjE0LDAlIHwgTyBtb3RvciBkbyBtZXJjYWRvOyBBdXJvcmEgcXVhc2UgYXVzZW50ZSB8CgojIyBUZW5kw6puY2lhcyBxdWUgaW1wb3J0YW0KMS4gKipNaWdyYcOnw6NvIHBhcmEgbyBkaWdpdGFsKio6IG8gb25saW5lIGrDoSDDqSB+MzAlIGRhcyB2ZW5kYXMgZG8gc2V0b3IgZSBjcmVzY2UgMuKAkzPDlyBtYWlzIHLDoXBpZG8gcXVlIGFzIGxvamFzLgoyLiAqKk1hcmtldHBsYWNlcyBjb25jZW50cmFtIHRyw6FmZWdvKio6IHBvdWNvcyBwbGF5ZXJzIGRvbWluYW0gYSBkZXNjb2JlcnRhIGRlIHByb2R1dG8uCjMuICoqUHJlc3PDo28gZGUgbWFyZ2VtKio6IGZyZXRlIGdyw6F0aXMsIGRldm9sdcOnw7VlcyBlIHByb21vw6fDtWVzIGNvcnJvZW0gYSByZW50YWJpbGlkYWRlIGRvIGRpZ2l0YWwuCjQuICoqTWFyY2EgcHLDs3ByaWEgZSBmaWRlbGlkYWRlKio6IHF1ZW0gdGVtIG1hcmNhIGUgZGFkbyBkZSBjbGllbnRlIGRlZmVuZGUgbWVsaG9yIGEgbWFyZ2VtLgo1LiAqKkxvZ8Otc3RpY2EgY29tbyBkaWZlcmVuY2lhbCoqOiBwcmF6byBkZSBlbnRyZWdhIHZpcmEgY3JpdMOpcmlvIGRlIGVzY29saGEuCgojIyBQZXJndW50YXMgcXVlIHVtIGV4ZWN1dGl2byBkZXZlcmlhIGZhemVyIChuw6NvIHJlc3Bvc3RhcyBwcm9udGFzKQotIE9uZGUgZXN0w6EgbyBsdWNybyBkZSB2ZXJkYWRlIOKAlCBlbSBxdWFpcyBzZWdtZW50b3MgZSBjYW5haXM/Ci0gTyBjcmVzY2ltZW50byBkbyBkaWdpdGFsIHBhZ2EgYSBtYXJnZW0gcXVlIGVsZSBjb25zb21lPwotIEEgbGlkZXJhbsOnYSBlbSBDYXNhICYgRGVjb3Jhw6fDo28gw6kgZGVmZW5zw6F2ZWwgb3UgZXN0w6Egc2VuZG8gZXJvZGlkYT8KLSBFbnRyYXIgbm8gbWFya2V0cGxhY2Ugw6kgY29uc3RydWlyLCBjb21wcmFyIG91IHNlIGFsaWFyPwoKLS0tCgojIyMgUGFyYSBvIGV4ZXJjw61jaW8KVXNlIGVzdGUgcGFub3JhbWEgKipjb21vIGhpcMOzdGVzZSBpbmljaWFsKiogZSBwZcOnYSBhbyBDbGF1ZGUgcGFyYSAqKnBlc3F1aXNhciBlIHZlcmlmaWNhcioqIG9zIG7Dum1lcm9zIHJlYWlzIGRvIHNldG9yIChjb20gZm9udGVzKSwgY29tcGFyYXIgY29tIGEgcG9zacOnw6NvIGRhIEF1cm9yYSBlIGxpc3RhciBhcyAzIHBlcmd1bnRhcyBtYWlzIGltcG9ydGFudGVzIHBhcmEgbyBib2FyZC4gTnVuY2EgbGV2ZSB1bSBuw7ptZXJvIGFkaWFudGUgc2VtIGNvbmZlcmlyIGEgZm9udGUuCg==","Aurora_Concorrentes.md":"data:text/markdown;base64,IyBQZXJmaXMgZG9zIGNvbmNvcnJlbnRlcyBkYSBBdXJvcmEgKENBU08gRklDVMONQ0lPKQoKPiAqKkFWSVNPOioqIERvY3VtZW50byAqKmZpY3TDrWNpbyoqLCBjcmlhZG8gcGFyYSB0cmVpbmFtZW50by4gRW1wcmVzYXMgZSBuw7ptZXJvcyAqKm7Do28gc8OjbyByZWFpcyoqLiBVc2UtbyBwYXJhIG8gZXhlcmPDrWNpbyBkZSBhbsOhbGlzZSBjcsOtdGljYSBkYSBjb25jb3Jyw6puY2lhIOKAlCBlIHBhcmEgdHJlaW5hciBvICJwb2RlciBkYXMgcGVyZ3VudGFzIi4KCiMjIE1lcmNhZG9WaXZvIOKAlCBhIGFtZWHDp2EgZGlnaXRhbAotICoqUmVjZWl0YSB+UiQgMTIgYmkqKiwgY3Jlc2NlbmRvICoqfjIyJSBhL2EqKi4gTWFyZ2VtIEVCSVREQSBiYWl4YSAofjUsNSUpIOKAlCBjcmVzY2UgcXVlaW1hbmRvIG1hcmdlbS4KLSBOYXRpdm8gZGlnaXRhbCwgbWFya2V0cGxhY2UgZm9ydGUsIGxvZ8Otc3RpY2EgcHLDs3ByaWEgZSBhcHAgY29tIG11aXRvIHRyw6FmZWdvLgotICoqRXN0cmF0w6lnaWE6KiogcHJlw6dvIGFncmVzc2l2byArIHNvcnRpbWVudG8gaW5maW5pdG8gKyBlbnRyZWdhIHLDoXBpZGEgcGFyYSBkb21pbmFyIGEgZGVzY29iZXJ0YS4KLSAqKkZyYXF1ZXphOioqIHJlbnRhYmlsaWRhZGUgZnLDoWdpbDsgZGVwZW5kZSBkZSBjYXBpdGFsIGJhcmF0byBwYXJhIHN1c3RlbnRhciBvIGNyZXNjaW1lbnRvLgoKIyMgTHVtacOocmUgVmFyZWpvIOKAlCBhIG1hcmNhIHByZW1pdW0KLSAqKlJlY2VpdGEgflIkIDYsOCBiaSoqLCArNyUgYS9hLCBtYXJnZW0gc2F1ZMOhdmVsICh+OSUpLgotIEZvcnRlIGVtICoqZXN0aWxvIGRlIHZpZGEqKiwgbG9qYXMtY29uY2VpdG8sIGV4cGVyacOqbmNpYSBlIG1hcmNhLgotICoqRnJhcXVlemE6KiogbWVub3MgY29tcGV0aXRpdm8gZW0gcHJlw6dvOyBkaWdpdGFsIG1lZGlhbm8uCgojIyBQb250b0NlcnRvIOKAlCBvIGNvbmNvcnJlbnRlIGRpcmV0bwotICoqUmVjZWl0YSB+UiQgNSwyIGJpKiosICszJSBhL2EuIE1vZGVsbyBwYXJlY2lkbyBjb20gbyBkYSBBdXJvcmEgKGxvamFzICsgZS1jb21tZXJjZSkuCi0gKipFc3RyYXTDqWdpYToqKiBwcmXDp28gYWdyZXNzaXZvIGUgY29iZXJ0dXJhIG5hY2lvbmFsLgotICoqRnJhcXVlemE6KiogbWFyY2EgcG91Y28gZGlmZXJlbmNpYWRhOyB0YW1iw6ltIHNvZnJlIGNvbSBhIG1pZ3Jhw6fDo28gYW8gZGlnaXRhbC4KCiMjIENhc2FCb2Eg4oCUIG8gZXNwZWNpYWxpc3RhIGVtIGNhc2EKLSAqKlJlY2VpdGEgflIkIDMsNCBiaSoqLCArNSUgYS9hLCAqKm1lbGhvciBtYXJnZW0gZG8gZ3J1cG8gKH4xMCw1JSkqKi4KLSBGb3J0ZSBlbSAqKkNhc2EgJiBEZWNvcmHDp8OjbyoqIChvIHRlcnJpdMOzcmlvIGRhIEF1cm9yYSksIGxvamFzIGRlIGJhaXJybyBlIHByb3hpbWlkYWRlLgotICoqRnJhcXVlemE6KiogZXNjYWxhIG1lbm9yOyBwb3VjYSBwcmVzZW7Dp2EgZGlnaXRhbC4KCi0tLQoKIyMjIFBhcmEgbyBleGVyY8OtY2lvIOKAlCBzZWphIGNyw610aWNvLCBuw6NvIGNvbXBsYWNlbnRlClBlw6dhIGFvIENsYXVkZSBwYXJhOgoxLiBNb250YXIgdW1hICoqdGFiZWxhIGNvbXBhcmF0aXZhKiogKHJlY2VpdGEsIGNyZXNjaW1lbnRvLCBtYXJnZW0sIGNhbmFsLCBmb3LDp2EvZnJhcXVlemEpIGUgKipyYW5xdWVhciBhIGFtZWHDp2EqKiBxdWUgY2FkYSB1bSByZXByZXNlbnRhIHBhcmEgYSBBdXJvcmEuCjIuIEFnaXIgY29tbyAqKmFkdm9nYWRvIGRvIGRpYWJvKio6ICJhdGFxdWUgYSB0ZXNlIGRlIHF1ZSBvIE1lcmNhZG9WaXZvIMOpIGEgbWFpb3IgYW1lYcOnYSDigJQgZSBzZSBvIHJpc2NvIHJlYWwgZm9yIGEgQ2FzYUJvYSBubyBub3NzbyB0ZXJyaXTDs3JpbyBkZSBtYWlvciBtYXJnZW0/Ii4KMy4gRmF6ZXIgdW0gKipwcmUtbW9ydGVtKio6ICJlc3RhbW9zIGVtIDIwMjcgZSBhIEF1cm9yYSBwZXJkZXUgYSBsaWRlcmFuw6dhIGVtIENhc2EgJiBEZWNvcmHDp8Ojby4gTyBxdWUgZGV1IGVycmFkbz8iLgo0LiBMaXN0YXIgYXMgKipwZXJndW50YXMqKiBxdWUgdm9jw6ogZGV2ZXJpYSBsZXZhciBhbyBjb21pdMOqIOKAlCBwb3JxdWUgYm9hIGRlY2lzw6NvIGNvbWXDp2EgcG9yIGJvYSBwZXJndW50YS4K","biblioteca-de-perguntas.md":"data:text/markdown;base64,IyBCaWJsaW90ZWNhIGRlIHBlcmd1bnRhcyBwYXJhIHVtIG5vdGVib29rIGV4ZWN1dGl2bwoKQ29sZSBlIGFkYXB0ZS4gRnVuY2lvbmFtIG1lbGhvciBxdWFuZG8gYXMgZm9udGVzIGNlcnRhcyBlc3TDo28gbm8gbm90ZWJvb2suCgojIyBFbnRlbmRlciByw6FwaWRvCi0gUmVzdW1hIGVtIDUgcG9udG9zIHBhcmEgcXVlbSBuw6NvIGxldSBuYWRhLgotIFF1YWlzIHPDo28gb3MgMyBtYWlvcmVzIHJpc2NvcyBuZXN0YXMgZm9udGVzPyBDaXRlIGNhZGEgdW0uCi0gRmHDp2EgdW1hIGxpbmhhIGRvIHRlbXBvIGRvcyBmYXRvcy4KCiMjIENydXphciBlIGNoZWNhcgotIE9uZGUgYXMgZm9udGVzIGRpdmVyZ2VtIG91IHNlIGNvbnRyYWRpemVtPwotIE8gcXVlIFtwZXNzb2Evw6FyZWFdIGRpc3NlIHNvYnJlIFt0ZW1hXT8gQ2l0ZSBhIGZvbnRlLgotIE8gcXVlIGVzdMOhIGZhbHRhbmRvIGFxdWkgcGFyYSBldSBkZWNpZGlyIGNvbSBzZWd1cmFuw6dhPwoKIyMgUHJlcGFyYXIgdW1hIHJldW5pw6NvCi0gTGlzdGUgYXMgOCBwZXJndW50YXMgbWFpcyBkaWbDrWNlaXMgcXVlIG8gYm9hcmQgcG9kZSBmYXplciDigJQgZSBhIHJlc3Bvc3RhIGFuY29yYWRhLgotIEdlcmUgdW0gZG9jdW1lbnRvIGRlIGJyaWVmaW5nIGRlIDEgcMOhZ2luYSBwYXJhIG8gY29taXTDqi4KCiMjIFBhcmEgb3V2aXIKLSBHZXJlIHVtIEF1ZGlvIE92ZXJ2aWV3IGZvY2FkbyBlbSBbdGVtYV0sIHRvbSBleGVjdXRpdm8sIH4xMCBtaW4uCgo+IFNlbXByZSBjbGlxdWUgbmEgY2l0YcOnw6NvIGUgY29uZmlyYSBhbnRlcyBkZSBsZXZhciBhZGlhbnRlLgo=","guia-montar-notebook.md":"data:text/markdown;base64,IyBDb21vIG1vbnRhciB1bSBib20gbm90ZWJvb2sgKHBhc3NvIGEgcGFzc28pCgoxLiAqKkRlZmluYSBvIHRlbWEqKiBkbyBub3RlYm9vayDigJQgdW0gcG9yIGRlY2lzw6NvL2Fzc3VudG8gKGV4LjogIlJlc3VsdGFkb3MgJiBtZXJjYWRvIikuCjIuICoqQ3VyZSBhcyBmb250ZXMqKjogc3ViYSBzw7MgbyBxdWUgw6kgcmVsZXZhbnRlIGUgY29uZmnDoXZlbC4gTWVub3MgZSBtZWxob3IgPiBtdWl0byBlIGRpc3BlcnNvLgogICAtIEFjZWl0YTogUERGLCBHb29nbGUgRG9jcy9TbGlkZXMsIHRleHRvLCBNYXJrZG93biwgd2ViIChVUkwpLCBZb3VUdWJlLCDDoXVkaW8gKGNvbmZpcm1lIG8gdmlnZW50ZSkuCjMuICoqRGVpeGUgbyBOb3RlYm9va0xNIGxlcioqIOKAlCBlbGUgZ2VyYSB1bSByZXN1bW8gZSBzdWdlc3TDtWVzIGluaWNpYWlzLgo0LiAqKkNvbWVjZSBwZWxvIE5vdGVib29rIEd1aWRlKiogKHJlc3VtbywgRkFRLCBsaW5oYSBkbyB0ZW1wbykgYW50ZXMgZGUgcGVyZ3VudGFyIMOgIHRvYS4KNS4gKipQZXJndW50ZSBlIGNvbmZpcmEgYSBjaXRhw6fDo28qKiDigJQgdG9kYSBhZmlybWHDp8OjbyB0ZW0gb3JpZ2VtIGNsaWPDoXZlbC4KNi4gKipHZXJlIHVtIEF1ZGlvIE92ZXJ2aWV3KiogcGFyYSBvdXZpciBvIGVzc2VuY2lhbCBubyB0cmFqZXRvLgo3LiAqKkNvbXBhcnRpbGhlKiogKHNlIGZvciBkbyB0aW1lKSBjb20gYWNlc3NvIGNvbnRyb2xhZG8uCjguICoqRXhwb3J0ZSBvIHF1ZSBjb25mZXJpdSoqIGUgbGV2ZSBwYXJhIG9uZGUgcHJvZHV6IG8gZW50cmVnw6F2ZWwgKGV4LjogQ2xhdWRlKS4KCkRpY2E6IG5vdGVib29rcyBmb2NhZG9zIHJlc3BvbmRlbSBtZWxob3IuIFNlIHVtIHRlbWEgY3Jlc2NldSBkZW1haXMsIGRpdmlkYSBlbSBkb2lzLgo=","checklist-governanca-notebooklm.md":"data:text/markdown;base64,IyBDaGVja2xpc3QgZGUgZ292ZXJuYW7Dp2Eg4oCUIE5vdGVib29rTE0KCiMjIERhZG9zIGUgTEdQRAotIFsgXSBTw7Mgc3ViaW1vcyBmb250ZXMgYXByb3ZhZGFzPyBOYWRhIGRlIGRhZG8gcGVzc29hbCBvdSBjb25maWRlbmNpYWwgc2VtIGJhc2UgbGVnYWwuCi0gWyBdIEVtIGFtYmllbnRlIGNvcnBvcmF0aXZvLCB1c2Ftb3MgYSB2ZXJzw6NvIGFwcm92YWRhIChXb3Jrc3BhY2UgLyBOb3RlYm9va0xNIFBsdXMpPwotIFsgXSBDb25oZWNlbW9zIGEgcG9sw610aWNhIGRlIHVzbyBkZSBkYWRvcyB2aWdlbnRlIGRvIHByb2R1dG8/CgojIyBWZXJpZmljYcOnw6NvCi0gWyBdIFRvZGEgYWZpcm1hw6fDo28gbGV2YWRhIGFkaWFudGUgdGV2ZSBhIGNpdGHDp8OjbyBjb25mZXJpZGEgbmEgZm9udGU/Ci0gWyBdIFRyYXRhbW9zIGEgc2HDrWRhIGNvbW8gaW5zdW1vLCBuw6NvIGNvbW8gdmVyZGFkZSBmaW5hbD8KCiMjIENvbXBhcnRpbGhhbWVudG8KLSBbIF0gUXVlbSBjb21wYXJ0aWxoYSB1bSBub3RlYm9vayBzYWJlIHF1ZSBjb21wYXJ0aWxoYSBhcyBmb250ZXMgZGVudHJvIGRlbGU/Ci0gWyBdIEFjZXNzbyBjb25jZWRpZG8gw6kgbyBtw61uaW1vIG5lY2Vzc8OhcmlvIChwcmVmZXLDqm5jaWEgcG9yIGxlaXR1cmEpPwotIFsgXSBIw6EgcmV2aXPDo28gcGVyacOzZGljYSBkZSBxdWVtIHRlbSBhY2Vzc28gYSBxdcOqPwoKIyMgVmFsb3IKLSBbIF0gSMOhIG5vdGVib29rcyAidml2b3MiIHBvciB0ZW1hIHJlY29ycmVudGUgKHJlc3VsdGFkb3MsIG9uYm9hcmRpbmcsIGR1ZSBkaWxpZ2VuY2UpPwotIFsgXSBNZWRpbW9zIG8gdGVtcG8gZWNvbm9taXphZG8gZSBhIHF1YWxpZGFkZSBkYXMgZGVjaXPDtWVzIGFwb2lhZGFzPwo="};</script><script>
+(function(){
+  "use strict";
+  var KEY="treino-notebooklm-exec-progresso";
+  var ORDER=["00","01","02","03","04","05","06","07","08","09","10","11","12"];
+  function load(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}}
+  function save(p){try{localStorage.setItem(KEY,JSON.stringify(p))}catch(e){}}
+
+  function initCopy(){
+    document.querySelectorAll(".codeblock").forEach(function(block){
+      if(block.querySelector(".copy-btn"))return;
+      var pre=block.querySelector("pre"); if(!pre)return;
+      var btn=document.createElement("button");
+      btn.className="copy-btn"; btn.type="button"; btn.textContent="Copiar";
+      btn.addEventListener("click",function(){
+        var t=pre.innerText;
+        function ok(){btn.textContent="Copiado!";btn.classList.add("copied");
+          setTimeout(function(){btn.textContent="Copiar";btn.classList.remove("copied")},1600);}
+        if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok,fb)}else{fb()}
+        function fb(){var ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";
+          ta.style.opacity="0";document.body.appendChild(ta);ta.select();
+          try{document.execCommand("copy");ok()}catch(e){}document.body.removeChild(ta);}
+      });
+      block.appendChild(btn);
+    });
+  }
+  function positionTip(t){
+    var tip=t.querySelector(".tip"); if(!tip)return;
+    var r=t.getBoundingClientRect(), w=tip.offsetWidth, center=r.left+r.width/2;
+    var left=center-w/2, m=10, shift=0;
+    if(left<m)shift=m-left;
+    else if(left+w>window.innerWidth-m)shift=(window.innerWidth-m)-(left+w);
+    shift=Math.round(shift);
+    tip.style.transform="translateX(calc(-50% + "+shift+"px)) translateY(-2px)";
+    tip.style.setProperty("--arrow-shift",(-shift)+"px");
+  }
+  function initTooltips(){
+    var terms=document.querySelectorAll(".term");
+    terms.forEach(function(t){t.setAttribute("tabindex","0");
+      t.addEventListener("mouseenter",function(){positionTip(t)});
+      t.addEventListener("focus",function(){positionTip(t)});
+      t.addEventListener("click",function(e){e.stopPropagation();
+        var was=t.classList.contains("open");
+        terms.forEach(function(o){o.classList.remove("open")});
+        if(!was){t.classList.add("open");positionTip(t)}});});
+    document.addEventListener("click",function(){terms.forEach(function(o){o.classList.remove("open")})});
+  }
+  function refresh(){
+    var p=load(),done=0;
+    ORDER.forEach(function(id){
+      var on=!!p[id]; if(on)done++;
+      var toc=document.querySelector('[data-toc="'+id+'"]'); if(toc)toc.classList.toggle("done",on);
+      var sec=document.getElementById("modulo-"+id);
+      if(sec){var bar=sec.querySelector("[data-done-bar]");
+        if(bar)bar.classList.toggle("is-done",on);
+        var btn=sec.querySelector("[data-done-btn]");
+        if(btn)btn.textContent=on?"✓ Concluído":"Marcar como concluído";}
+    });
+    var pct=Math.round(done/ORDER.length*100);
+    var fill=document.querySelector("[data-progress-fill]"); if(fill)fill.style.width=pct+"%";
+    var txt=document.querySelector("[data-progress-text]"); if(txt)txt.textContent=done+" de "+ORDER.length+" módulos ("+pct+"%)";
+  }
+  function initDone(){
+    document.addEventListener("click",function(e){
+      var b=e.target.closest("[data-done-btn]"); if(!b)return;
+      var id=b.getAttribute("data-mod"); var p=load();
+      if(p[id])delete p[id]; else p[id]=true; save(p); refresh();
+    });
+  }
+  function initSpy(){
+    var links={}; document.querySelectorAll(".toc-link").forEach(function(a){
+      links[a.getAttribute("href").slice(1)]=a;});
+    var obs=new IntersectionObserver(function(es){
+      es.forEach(function(en){ if(en.isIntersecting){
+        var id=en.target.id;
+        Object.values(links).forEach(function(a){a.classList.remove("active")});
+        if(links[id])links[id].classList.add("active");
+      }});
+    },{rootMargin:"-20% 0px -70% 0px"});
+    document.querySelectorAll(".doc-section").forEach(function(s){obs.observe(s)});
+  }
+  function initDownloads(){
+    document.addEventListener("click",function(e){
+      var c=e.target.closest("[data-file]"); if(!c)return;
+      e.preventDefault();
+      var uri=(window.TRAINING_FILES||{})[c.getAttribute("data-file")]; if(!uri)return;
+      var a=document.createElement("a"); a.href=uri; a.download=c.getAttribute("data-file");
+      document.body.appendChild(a); a.click(); a.remove();
+    });
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    initCopy(); initTooltips(); initDone(); initDownloads(); refresh();
+    try{initSpy()}catch(e){}
+  });
+})();
+</script></body></html>

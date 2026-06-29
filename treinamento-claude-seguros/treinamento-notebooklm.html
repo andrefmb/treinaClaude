@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dominando o NotebookLM — caderno do participante</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@300..700&family=JetBrains+Mono:wght@400..700&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   Dominando o NotebookLM — Programa Executivo
+   Mesmo tema editorial do programa do Claude: papel quente, serifa, navy + ouro.
+   ========================================================================== */
+:root{
+  --navy:#16365c; --navy-deep:#0e2742; --navy-soft:#e7eef6;
+  --gold:#b5872f; --gold-soft:#f3ead6;
+  --paper:#f7f4ee; --paper-2:#fffdf8; --card:#fffefb;
+  --ink:#1c2433; --ink-soft:#2c3647; --muted:#5c6675; --muted-2:#8a92a0;
+  --line:#e4ddd0; --line-soft:#efe9dd;
+  --code-bg:#0e2742; --code-ink:#e9eef5;
+  --ok:#2f7d57; --ok-soft:#e1f0e8; --warn:#a8641a; --warn-soft:#f8ecd9; --danger:#a83232;
+  --radius:16px; --maxw:780px;
+  --font-display:"Fraunces",Georgia,"Times New Roman",serif;
+  --font-sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 500px at 100% -10%, var(--gold-soft) 0%, transparent 55%),
+    radial-gradient(1000px 600px at -10% 0%, var(--navy-soft) 0%, transparent 50%),
+    var(--paper);
+  background-attachment:fixed; color:var(--ink); font-family:var(--font-sans);
+  font-size:17px; line-height:1.72; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+a{color:inherit;}
+.topbar{position:sticky; top:0; z-index:40; display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:13px clamp(16px,5vw,44px); background:color-mix(in srgb, var(--paper) 86%, transparent);
+  backdrop-filter:blur(12px); border-bottom:1px solid var(--line);}
+.brand{text-decoration:none; display:inline-flex; align-items:baseline; gap:9px;}
+.brand .mark{font-family:var(--font-display); font-weight:600; font-size:1.25rem; color:var(--navy); letter-spacing:-0.01em;}
+.brand .sub{font-family:var(--font-mono); font-size:0.62rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold);}
+.topnav{display:flex; gap:4px; align-items:center;}
+.topnav a{text-decoration:none; color:var(--muted); font-size:0.92rem; padding:7px 13px; border-radius:999px; transition:all .15s; font-weight:500;}
+.topnav a:hover{color:var(--navy); background:var(--navy-soft);}
+.topnav a.active{color:#fff; background:var(--navy);}
+main{padding:clamp(28px,6vw,60px) clamp(16px,5vw,44px) 120px;}
+.wrap{max-width:var(--maxw); margin:0 auto;}
+h1,h2,h3{font-family:var(--font-display); line-height:1.14; letter-spacing:-0.01em; color:var(--ink);}
+h1{font-size:clamp(2.2rem,6vw,3.2rem); margin:0.18em 0 0.1em; font-weight:600;}
+h2{font-size:1.7rem; margin:2.2em 0 0.5em; font-weight:560;}
+h3{font-size:1.24rem; margin:1.6em 0 0.4em; font-weight:560;}
+p{margin:0.9em 0;}
+.lede{font-size:1.24rem; color:var(--muted); margin-top:0.4em; line-height:1.6;}
+.subtitle{font-size:1.12rem; color:var(--gold); font-weight:500; margin:0.1em 0 0.9em; font-style:italic; font-family:var(--font-display);}
+strong{font-weight:650; color:var(--ink);}
+em{font-style:italic;}
+hr{border:0; border-top:1px solid var(--line); margin:2.4em 0;}
+.kicker{font-family:var(--font-mono); font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:6px;}
+.meta-pill{font-family:var(--font-mono); font-size:0.76rem; letter-spacing:0.03em; color:var(--muted); text-transform:uppercase; border:1px solid var(--line); border-radius:999px; padding:5px 13px; display:inline-block; margin-bottom:14px; background:var(--paper-2);}
+.mod-number{font-family:var(--font-mono); font-size:2.4rem; font-weight:700; color:var(--navy); line-height:1; opacity:.85;}
+.prompt-label{font-family:var(--font-mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); margin:1.5em 0 6px; display:flex; align-items:center; gap:8px; font-weight:600;}
+.prompt-label::before{content:"▍"; color:var(--gold);}
+.codeblock{position:relative; background:var(--code-bg); color:var(--code-ink); border-radius:var(--radius); border:1px solid var(--navy-deep); margin:0.4em 0 1.4em; overflow:hidden; box-shadow:0 14px 34px -18px rgba(14,39,66,.5);}
+.codeblock pre{margin:0; padding:18px 16px 18px 18px; font-family:var(--font-mono); font-size:0.9rem; line-height:1.62; white-space:pre-wrap; word-break:break-word;}
+.copy-btn{position:absolute; top:9px; right:9px; font-family:var(--font-mono); font-size:0.71rem; letter-spacing:0.03em; color:#d6deea; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:5px 11px; cursor:pointer; transition:all .15s;}
+.copy-btn:hover{background:var(--gold); color:#fff; border-color:var(--gold);}
+.copy-btn.copied{background:var(--ok); color:#fff; border-color:var(--ok);}
+code.inline{font-family:var(--font-mono); font-size:0.86em; background:var(--navy-soft); border:1px solid var(--line); border-radius:6px; padding:1px 6px; color:var(--navy-deep);}
+ol.tips{list-style:none; counter-reset:tip; padding:0; margin:1.4em 0; display:flex; flex-direction:column; gap:10px;}
+ol.tips li{counter-increment:tip; position:relative; padding:14px 16px 14px 58px; border:1px solid var(--line); border-radius:var(--radius); background:var(--card);}
+ol.tips li::before{content:counter(tip); position:absolute; left:14px; top:13px; width:30px; height:30px; border-radius:999px; background:var(--navy); color:#fff; font-family:var(--font-mono); font-weight:700; font-size:.9rem; display:grid; place-items:center;}
+ol.tips .tip-t{display:block; font-weight:650; color:var(--ink);}
+ol.tips .tip-s{display:block; color:var(--muted); font-size:.92rem; margin-top:2px;}
+.exfiles{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0.7em 0 1.1em;}
+.exfiles-label{font-family:var(--font-mono); font-size:.66rem; text-transform:uppercase; letter-spacing:.07em; color:var(--muted-2);}
+.filechip{display:inline-flex; align-items:center; gap:6px; text-decoration:none; font-family:var(--font-mono); font-size:.8rem; color:var(--navy); background:var(--navy-soft); border:1px solid color-mix(in srgb, var(--navy) 22%, var(--line)); border-radius:999px; padding:4px 12px; transition:all .14s; cursor:pointer;}
+.filechip:hover{background:var(--navy); color:#fff;}
+.filechip .dl{opacity:.65; font-weight:700;}
+.term{border-bottom:2px dotted var(--gold); cursor:help; position:relative; font-weight:550;}
+.term:focus{outline:2px solid var(--gold); outline-offset:2px; border-radius:3px;}
+.term .tip{position:absolute; left:50%; bottom:calc(100% + 10px); transform:translateX(-50%); width:min(330px,80vw); background:var(--navy-deep); color:#eef3f9; font-family:var(--font-sans); font-weight:400; font-size:0.85rem; line-height:1.5; padding:12px 14px; border-radius:12px; box-shadow:0 16px 40px rgba(14,39,66,.4); opacity:0; visibility:hidden; transition:opacity .14s, transform .14s; z-index:60; text-align:left; pointer-events:none;}
+.term .tip strong{color:var(--gold); display:block; margin-bottom:3px; font-family:var(--font-mono); font-size:0.74rem; text-transform:uppercase; letter-spacing:.05em;}
+.term .tip::after{content:""; position:absolute; top:100%; left:calc(50% + var(--arrow-shift,0px)); transform:translateX(-50%); border:7px solid transparent; border-top-color:var(--navy-deep);}
+.term:hover .tip, .term:focus .tip, .term.open .tip{opacity:1; visibility:visible; transform:translateX(-50%) translateY(-2px);}
+details.box{border:1px solid var(--line); border-radius:var(--radius); margin:1.1em 0; background:var(--card);}
+details.box>summary{cursor:pointer; list-style:none; padding:14px 18px; font-weight:600; font-size:0.98rem; display:flex; align-items:center; gap:10px; user-select:none;}
+details.box>summary::-webkit-details-marker{display:none;}
+details.box>summary::before{content:"›"; color:var(--gold); font-weight:700; font-size:1.2em; transition:transform .18s; display:inline-block;}
+details.box[open]>summary::before{transform:rotate(90deg);}
+details.box>summary .tag{font-family:var(--font-mono); font-size:0.64rem; text-transform:uppercase; letter-spacing:.07em; color:var(--navy); background:var(--navy-soft); border-radius:6px; padding:2px 8px; font-weight:600;}
+details.box .box-body{padding:2px 18px 18px; color:var(--ink-soft);}
+details.box .box-body>*:first-child{margin-top:0;}
+.callout{border-left:3px solid var(--navy); background:var(--card); border-radius:0 var(--radius) var(--radius) 0; padding:14px 18px; margin:1.3em 0; color:var(--ink-soft);}
+.callout.warn{border-left-color:var(--warn); background:var(--warn-soft);}
+.callout.tip{border-left-color:var(--ok); background:var(--ok-soft);}
+.callout.gold{border-left-color:var(--gold); background:var(--gold-soft);}
+.callout .label{font-family:var(--font-mono); font-size:0.71rem; text-transform:uppercase; letter-spacing:.07em; color:var(--muted-2); display:block; margin-bottom:4px; font-weight:600;}
+.callout.warn .label{color:var(--warn);}
+.callout.tip .label{color:var(--ok);}
+.callout.gold .label{color:var(--gold);}
+.handson{border:1.5px solid var(--gold); border-radius:var(--radius); background:linear-gradient(180deg, var(--gold-soft) 0%, var(--card) 36%); padding:18px 20px; margin:1.6em 0;}
+.handson .ho-head{font-family:var(--font-mono); font-size:0.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:2px;}
+.handson h3{margin:0 0 0.3em;}
+.compare{display:grid; gap:14px; grid-template-columns:1fr 1fr; margin:1.3em 0;}
+.compare .col{border:1px solid var(--line); border-radius:var(--radius); padding:16px; background:var(--card);}
+.compare .col.weak{border-style:dashed;}
+.compare .col.strong{border-color:var(--navy); box-shadow:0 10px 28px -16px rgba(22,54,92,.4);}
+.compare .col .k{font-family:var(--font-mono); font-size:0.7rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted-2);}
+.compare .col.strong .k{color:var(--navy);}
+@media (max-width:620px){.compare{grid-template-columns:1fr;}}
+.stat-grid{display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); margin:1.3em 0;}
+.stat{border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; background:var(--card); border-top:3px solid var(--gold);}
+.stat .v{font-family:var(--font-display); font-size:1.9rem; font-weight:600; color:var(--navy); line-height:1.05;}
+.stat .l{font-size:0.88rem; color:var(--muted); margin-top:4px;}
+table.t{width:100%; border-collapse:collapse; margin:1.2em 0; font-size:0.93rem; background:var(--card); border-radius:var(--radius);}
+table.t th, table.t td{text-align:left; padding:10px 13px; border-bottom:1px solid var(--line); vertical-align:top;}
+table.t th{background:var(--navy); color:#fff; font-weight:600; font-size:0.82rem; letter-spacing:.02em;}
+table.t thead th:first-child{border-top-left-radius:var(--radius);}
+table.t thead th:last-child{border-top-right-radius:var(--radius);}
+table.t tr:last-child td:first-child{border-bottom-left-radius:var(--radius);}
+table.t tr:last-child td:last-child{border-bottom-right-radius:var(--radius);}
+table.t tr:last-child td{border-bottom:0;}
+table.t td:first-child{font-weight:600; color:var(--navy-deep);}
+.btn{display:inline-block; background:var(--navy); color:#fff; text-decoration:none; font-weight:600; padding:13px 28px; border-radius:999px; font-size:1.0rem; transition:all .14s; border:none; cursor:pointer; font-family:var(--font-sans);}
+.btn:hover{transform:translateY(-1px); box-shadow:0 12px 28px -10px rgba(22,54,92,.55); background:var(--navy-deep);}
+.btn.ghost{background:transparent; color:var(--navy); border:1.5px solid var(--navy);}
+.btn.ghost:hover{background:var(--navy-soft); box-shadow:none;}
+.btn.gold{background:var(--gold);}
+.btn.gold:hover{background:#9c7327; box-shadow:0 12px 28px -10px rgba(181,135,47,.55);}
+.hero{padding:5vh 0 2vh;}
+.hero .kicker{font-size:0.8rem;}
+.hero h1{font-size:clamp(2.6rem,8vw,4.4rem); max-width:16ch;}
+.hero .accent{color:var(--gold); font-style:italic;}
+.hero .lede{max-width:60ch;}
+.hero-actions{display:flex; gap:12px; flex-wrap:wrap; margin-top:1.6em;}
+.agenda{list-style:none; padding:0; margin:1.2em 0; border-left:2px solid var(--line);}
+.agenda li{position:relative; padding:8px 0 8px 22px; display:flex; gap:12px; align-items:baseline;}
+.agenda li::before{content:""; position:absolute; left:-6px; top:16px; width:10px; height:10px; border-radius:999px; background:var(--gold); border:2px solid var(--paper);}
+.agenda .ag-num{font-family:var(--font-mono); color:var(--navy); font-weight:700; min-width:26px;}
+.agenda .ag-t{flex:1;}
+.progress-bar{height:9px; background:var(--line); border-radius:999px; overflow:hidden; margin:12px 0 4px;}
+.progress-bar>span{display:block; height:100%; background:linear-gradient(90deg, var(--navy), var(--gold)); width:0; transition:width .4s;}
+.progress-text{font-family:var(--font-mono); font-size:0.82rem; color:var(--muted);}
+.mod-list{list-style:none; padding:0; margin:1em 0; display:flex; flex-direction:column; gap:9px;}
+.mod-row{display:flex; align-items:center; gap:16px; padding:15px 18px; border:1px solid var(--line); border-radius:var(--radius); background:var(--card); text-decoration:none; color:inherit; transition:all .14s;}
+.mod-row:hover{border-color:var(--navy); transform:translateX(3px); box-shadow:0 8px 22px -14px rgba(22,54,92,.4);}
+.mod-row .num{font-family:var(--font-mono); font-weight:700; color:var(--gold); min-width:30px; font-size:1.05rem;}
+.mod-row .body{flex:1;}
+.mod-row .title{font-weight:600; font-size:1.05rem;}
+.mod-row .desc{font-size:0.88rem; color:var(--muted);}
+.mod-row .check{width:24px; height:24px; border-radius:999px; border:2px solid var(--line); display:grid; place-items:center; font-size:0.82rem; color:transparent; flex-shrink:0;}
+.mod-row.done .check{background:var(--ok); border-color:var(--ok); color:#fff;}
+.mod-row.done .title{color:var(--muted);}
+.done-bar{display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin:2.6em 0 1.4em; padding:18px; border:1px dashed var(--gold); border-radius:var(--radius); background:var(--gold-soft);}
+.done-bar .grow{flex:1; min-width:180px;}
+.done-bar.is-done{border-style:solid; border-color:var(--ok); background:var(--ok-soft);}
+.doc-section{padding-top:2.4em; margin-top:2.4em; border-top:1px solid var(--line);}
+.doc-section:first-of-type{border-top:0;}
+footer{border-top:1px solid var(--line); padding:32px clamp(16px,5vw,44px); color:var(--muted-2); font-size:0.85rem;}
+footer .wrap{display:flex; flex-direction:column; gap:10px;}
+footer .flinks{display:flex; gap:16px; flex-wrap:wrap;}
+footer .flinks a{color:var(--muted); text-decoration:none;}
+footer .flinks a:hover{color:var(--navy);}
+@media (max-width:640px){body{font-size:16px;} .topnav a{padding:6px 9px; font-size:0.84rem;} .mod-number{font-size:1.8rem;}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#topo"><span class="mark">Dominando o NotebookLM</span> <span class="sub">Executivo</span></a>
+  <nav class="topnav">
+    <a href="#modulos">Módulos</a>
+    <a href="#recursos">Recursos</a>
+    <a href="#referencia">Referência</a>
+  </nav>
+</header>
+<main>
+<div class="wrap" id="topo">
+
+<!-- ===================== HERO ===================== -->
+<div class="hero">
+  <div class="kicker">Programa Executivo</div>
+  <h1>Dominando o <span class="accent">NotebookLM</span></h1>
+  <p class="lede">Reúna as fontes que você confia — circulares regulatórias, relatórios de mercado, transcrições de resultados, palestras no YouTube — e transforme-as num <strong>radar</strong> que responde com <strong>citações</strong>, vira <strong>podcast</strong> para ouvir no trânsito e <strong>mapa mental</strong> do cenário. Um programa hands-on para a alta liderança. O ponto não é virar técnico: é montar um radar confiável e ler com espírito crítico. Fio condutor: construir o <strong>Radar Regulatório &amp; de Mercado — Seguros 2026</strong>.</p>
+  <div class="hero-actions">
+    <a class="btn" href="#modulo-00">Começar pelo Módulo 00 →</a>
+    <a class="btn ghost" href="#recursos">Ver recursos</a>
+  </div>
+</div>
+
+<div class="callout warn"><span class="label">A regra de hoje</span>Somente dados fictícios. O NotebookLM é fundamentado nas <em>fontes que você sobe</em> — então o cuidado com o que se sobe é ainda mais importante. Nunca carregue dados reais de clientes, segurados ou pessoas (dados pessoais — LGPD), nem documentos sigilosos, em uma conta que a empresa ainda não aprovou. A disciplina começa agora e volta no módulo de governança.</div>
+
+<h2>O que você será capaz de fazer</h2>
+<table class="t">
+  <thead><tr><th>Ao final, cada participante consegue…</th><th></th></tr></thead>
+  <tbody>
+    <tr><td>Montar um radar de fontes confiáveis</td><td>circulares, relatórios, transcrições, vídeos e páginas web.</td></tr>
+    <tr><td>Conversar com o corpus</td><td>perguntas com respostas <em>citadas</em> de volta à fonte.</td></tr>
+    <tr><td>Sintetizar para o board</td><td>briefing executivo, comparação de fontes e linha do tempo.</td></tr>
+    <tr><td>Gerar áudio e vídeo do cenário</td><td>o “podcast” para o trânsito e o vídeo para apresentar.</td></tr>
+    <tr><td>Mapear e estudar o tema</td><td>mapa mental do cenário e guia de estudo para a equipe.</td></tr>
+    <tr><td>Escolher a ferramenta certa</td><td>quando usar o NotebookLM e quando usar o Claude.</td></tr>
+  </tbody>
+</table>
+
+<h2>A jornada</h2>
+<ul class="agenda">
+  <li><span class="ag-num">00</span><span class="ag-t">Abertura — por que isto importa</span></li>
+  <li><span class="ag-num">01</span><span class="ag-t">O que é o NotebookLM</span></li>
+  <li><span class="ag-num">02</span><span class="ag-t">Primeiros passos: notebook e fontes</span></li>
+  <li><span class="ag-num">03</span><span class="ag-t">Conversar com as fontes</span></li>
+  <li><span class="ag-num">04</span><span class="ag-t">Visão geral em áudio e vídeo</span></li>
+  <li><span class="ag-num">05</span><span class="ag-t">Notas inteligentes: briefing, FAQ, mapa mental</span></li>
+  <li><span class="ag-num">06</span><span class="ag-t">Casos de uso executivos</span></li>
+  <li><span class="ag-num">07</span><span class="ag-t">Limites, privacidade e governança</span></li>
+</ul>
+<p><span style="color:var(--muted)">Oito módulos curtos, do “o que é” à mão na massa e à governança. Priorize abrir o NotebookLM e fazer junto — cada módulo cabe em uma sessão curta.</span></p>
+
+<!-- ===================== LISTA DE MÓDULOS (progresso) ===================== -->
+<h2 id="modulos">O programa</h2>
+<div class="progress-bar"><span data-progress-fill></span></div>
+<p class="progress-text" data-progress-text>0 de 8 módulos concluídos</p>
+<div data-mod-list>
+<ul class="mod-list">
+  <a class="mod-row" data-mod-row="00" href="#modulo-00"><span class="check">✓</span><span class="num">00</span><span class="body"><span class="title">Abertura</span><br><span class="desc">Por que o NotebookLM importa para um executivo</span></span></a>
+  <a class="mod-row" data-mod-row="01" href="#modulo-01"><span class="check">✓</span><span class="num">01</span><span class="body"><span class="title">O que é o NotebookLM</span><br><span class="desc">Fontes, fundamentação e citações</span></span></a>
+  <a class="mod-row" data-mod-row="02" href="#modulo-02"><span class="check">✓</span><span class="num">02</span><span class="body"><span class="title">Primeiros passos</span><br><span class="desc">Criar o notebook e reunir as fontes</span></span></a>
+  <a class="mod-row" data-mod-row="03" href="#modulo-03"><span class="check">✓</span><span class="num">03</span><span class="body"><span class="title">Conversar com as fontes</span><br><span class="desc">Perguntar, resumir e checar a citação</span></span></a>
+  <a class="mod-row" data-mod-row="04" href="#modulo-04"><span class="check">✓</span><span class="num">04</span><span class="body"><span class="title">Visão geral em áudio e vídeo</span><br><span class="desc">O “podcast” e o vídeo dos seus documentos</span></span></a>
+  <a class="mod-row" data-mod-row="05" href="#modulo-05"><span class="check">✓</span><span class="num">05</span><span class="body"><span class="title">Notas inteligentes</span><br><span class="desc">Briefing, FAQ, guia de estudo e mapa mental</span></span></a>
+  <a class="mod-row" data-mod-row="06" href="#modulo-06"><span class="check">✓</span><span class="num">06</span><span class="body"><span class="title">Casos de uso executivos</span><br><span class="desc">Casos nativos + NotebookLM vs Claude</span></span></a>
+  <a class="mod-row" data-mod-row="07" href="#modulo-07"><span class="check">✓</span><span class="num">07</span><span class="body"><span class="title">Limites, privacidade e governança</span><br><span class="desc">O papel da liderança é governar o uso</span></span></a>
+</ul>
+</div>
+
+<!-- ===================== MÓDULO 00 ===================== -->
+<section id="modulo-00" class="doc-section">
+  <div class="meta-pill">Ato I · Módulo 00</div>
+  <div class="mod-number">00</div>
+  <h1>Abertura</h1>
+  <p class="subtitle">Por que isto importa para quem decide</p>
+  <p>Todo executivo precisa acompanhar um cenário em movimento: novas regras do regulador, relatórios de mercado, resultados de concorrentes, a opinião de especialistas. É muito material, em formatos diferentes (PDF, web, vídeo) e que muda toda semana. Acompanhar tudo é caro; ficar para trás é arriscado. O <span class="term">NotebookLM<span class="tip"><strong>NotebookLM</strong>Ferramenta de pesquisa e síntese do Google que trabalha <em>somente</em> sobre as fontes que você reúne — e responde citando os trechos exatos.</span></span> ataca exatamente isso: ele lê <em>as fontes que você junta</em> e vira um radar que responde, sintetiza e ensina — sempre apontando de onde tirou cada afirmação.</p>
+  <p>A diferença para um chatbot genérico é o <strong>foco nas suas fontes</strong>. Em vez de “o que a internet acha”, você recebe “o que <em>as suas fontes confiáveis</em> dizem”, com a citação ao lado para conferir. Para decisão executiva, isso muda o jogo: menos invenção, mais rastreabilidade.</p>
+  <div class="callout gold"><span class="label">O contrato deste programa</span>Você não vai virar técnico. Vai virar alguém que monta um radar confiável de um tema, sintetiza um monte de fontes em minutos — e sabe quando confiar, quando conferir e o que nunca subir.</div>
+  <h2>O caso: montar um Radar Regulatório &amp; de Mercado</h2>
+  <p>Ao longo do programa você vai construir um notebook — o <strong>Radar — Seguros 2026</strong> — reunindo fontes fictícias e públicas sobre os temas que tiram o sono de um executivo de seguros: <strong>inteligência artificial, Open Insurance e as novas regras do setor</strong>. Vai subir uma circular normativa, um relatório setorial, a transcrição de uma teleconferência de resultados (da fictícia <strong>Aurora Seguros S.A.</strong>), um painel de especialistas — e ainda vídeos do YouTube e páginas oficiais. No fim, você terá um <strong>briefing para o board</strong>, um <strong>áudio para o trânsito</strong> e um <strong>mapa mental</strong> do cenário. Tudo se transfere direto para os seus temas reais.</p>
+  <div class="done-bar" data-done-bar data-mod="00" data-next-label="01 · O que é o NotebookLM" data-next-href="#modulo-01"><span class="grow">Terminou a abertura? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn type="button">Marcar como concluído</button></div>
+</section>
+
+<!-- ===================== MÓDULO 01 ===================== -->
+<section id="modulo-01" class="doc-section">
+  <div class="meta-pill">Ato I · Módulo 01</div>
+  <div class="mod-number">01</div>
+  <h1>O que é o NotebookLM</h1>
+  <p class="subtitle">Fontes, fundamentação e citações</p>
+  <p>O NotebookLM é uma ferramenta do Google para <strong>pensar com seus próprios documentos</strong>. Você cria um <span class="term">notebook<span class="tip"><strong>Notebook</strong>Um espaço de trabalho que reúne um conjunto de fontes sobre um tema. Tudo o que você pergunta ali é respondido com base só naquelas fontes.</span></span>, sobe um conjunto de <span class="term">fontes<span class="tip"><strong>Fonte</strong>Cada documento que você adiciona ao notebook: PDF, Google Doc, Slides, site, vídeo do YouTube, áudio ou texto colado.</span></span> e conversa com elas. Por baixo, ele usa os modelos <span class="term">Gemini<span class="tip"><strong>Gemini</strong>A família de modelos de IA do Google que dá “motor” ao NotebookLM. Você não precisa escolher modelo — o NotebookLM cuida disso.</span></span> do Google — mas você não precisa escolher nem configurar modelo.</p>
+
+  <h2>A ideia central: fundamentação (grounding)</h2>
+  <p>A característica que define o NotebookLM é a <span class="term">fundamentação<span class="tip"><strong>Fundamentação (grounding)</strong>O assistente responde apenas com base nas fontes do notebook, e cada afirmação vem com um número que leva ao trecho exato. Reduz muito a invenção.</span></span>: as respostas se baseiam só nas fontes do notebook, e cada frase relevante vem com uma <strong>citação clicável</strong> que leva ao trecho original. Isso reduz drasticamente a “invenção” típica de chatbots e dá rastreabilidade — essencial quando a resposta vira base de uma decisão.</p>
+
+  <table class="t">
+    <thead><tr><th>Chatbot genérico</th><th>NotebookLM</th></tr></thead>
+    <tbody>
+      <tr><td>Responde com o que “sabe” do treino + web</td><td>Responde com o que <em>está nas suas fontes</em></td></tr>
+      <tr><td>Citações nem sempre confiáveis</td><td>Cada afirmação aponta o trecho exato</td></tr>
+      <tr><td>Bom para ideação aberta</td><td>Bom para analisar <em>o seu material</em> com rastreabilidade</td></tr>
+    </tbody>
+  </table>
+
+  <h2>O que dá para fazer</h2>
+  <table class="t">
+    <thead><tr><th>Capacidade</th><th>Em seguros</th></tr></thead>
+    <tbody>
+      <tr><td>Perguntar e obter respostas citadas</td><td>“O que a nova circular exige da liderança?” → com o trecho.</td></tr>
+      <tr><td>Resumir fontes longas</td><td>Um relatório setorial inteiro em uma página executiva.</td></tr>
+      <tr><td>Comparar fontes e visões</td><td>O que o relatório, o regulador e os especialistas dizem sobre IA.</td></tr>
+      <tr><td>Gerar visão geral em áudio/vídeo</td><td>“Podcast” do cenário regulatório para ouvir no trânsito.</td></tr>
+      <tr><td>Criar notas estruturadas</td><td>Briefing, FAQ, guia de estudo e mapa mental do tema.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout"><span class="label">Funciona em português</span>O NotebookLM lê e responde em português e em dezenas de outros idiomas, e a visão geral em áudio já suporta vários idiomas. Confirme o idioma da interface nas configurações.</div>
+
+  <div class="callout warn"><span class="label">Lembre-se</span>O NotebookLM é poderoso porque só olha as suas fontes — mas isso também significa que <strong>a qualidade da resposta depende da qualidade do que você subiu</strong>. Fonte incompleta, resposta incompleta.</div>
+
+  <div class="done-bar" data-done-bar data-mod="01" data-next-label="02 · Primeiros passos" data-next-href="#modulo-02"><span class="grow">Terminou este módulo? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn type="button">Marcar como concluído</button></div>
+</section>
+
+<!-- ===================== MÓDULO 02 ===================== -->
+<section id="modulo-02" class="doc-section">
+  <div class="meta-pill">Ato I · Módulo 02</div>
+  <div class="mod-number">02</div>
+  <h1>Primeiros passos</h1>
+  <p class="subtitle">Criar o notebook e reunir as fontes</p>
+  <p>Tudo começa em <code class="inline">notebooklm.google.com</code>, com a sua conta Google. O fluxo é simples: <strong>criar um notebook → adicionar fontes → começar a perguntar</strong>.</p>
+
+  <h2>Tipos de fonte que você pode adicionar</h2>
+  <table class="t">
+    <thead><tr><th>Fonte</th><th>Como</th></tr></thead>
+    <tbody>
+      <tr><td>PDF, Word, texto</td><td>Upload do arquivo (ex.: circular, relatório setorial).</td></tr>
+      <tr><td>Google Docs e Slides</td><td>Conectar direto do seu Drive.</td></tr>
+      <tr><td>Sites e páginas web</td><td>Colar a URL (ex.: a página do regulador).</td></tr>
+      <tr><td>Vídeos do YouTube</td><td>Colar o link — ele usa a transcrição (ex.: palestra do setor).</td></tr>
+      <tr><td>Texto ou Markdown colado</td><td>Colar trechos avulsos (ex.: uma nota, um e-mail).</td></tr>
+      <tr><td>Áudio</td><td>Upload de gravações (ex.: uma teleconferência).</td></tr>
+    </tbody>
+  </table>
+
+  <details class="box"><summary><span class="tag">Limites</span> Quantas fontes e qual tamanho?</summary><div class="box-body">
+  <p>Na versão gratuita, um notebook costuma aceitar dezenas de fontes (em torno de <strong>50</strong>), cada uma com centenas de milhares de palavras. O <span class="term">NotebookLM Plus<span class="tip"><strong>NotebookLM Plus</strong>A versão paga (via Google One AI Premium ou Google Workspace) com limites maiores, mais visões em áudio por dia, personalização e recursos de equipe.</span></span> eleva bastante esses limites e adiciona recursos de equipe. <strong>Os números mudam com frequência</strong> — confirme o que está vigente na página oficial (ver Referência).</p>
+  </div></details>
+
+  <div class="callout tip"><span class="label">Dica de organização</span>Um notebook = um tema. Não jogue tudo num só. Ex.: “Radar — Seguros 2026”, “IA e regulação”, “Concorrência — resultados do trimestre”. Assim as respostas ficam focadas e as citações, úteis.</div>
+
+  <div class="callout gold"><span class="label">Misture os tipos de fonte</span>O valor real aparece quando você combina <strong>arquivos + uma página web + um vídeo do YouTube</strong> no mesmo notebook. O NotebookLM usa a transcrição do vídeo como fonte e cita o trecho — igual a um documento.</div>
+
+  <div class="handson">
+    <div class="ho-head">Mão na massa · montar o radar</div>
+    <h3>Crie o notebook “Radar — Seguros 2026”</h3>
+    <p>Baixe o <strong>pacote de fontes</strong> (na seção <a href="#recursos">Recursos</a>) e suba os arquivos num novo notebook chamado <strong>“Radar — Seguros 2026”</strong>. Comece por estes quatro:</p>
+    <div class="exfiles">
+      <span class="exfiles-label">Arquivos</span>
+      <a class="filechip" href="arquivos-notebooklm/Radar_Circular_SUSEP_Resumo.md" download>Circular Normativa <span class="dl">↓</span></a>
+      <a class="filechip" href="arquivos-notebooklm/Radar_Relatorio_Setorial_2026.md" download>Relatório Setorial <span class="dl">↓</span></a>
+      <a class="filechip" href="arquivos-notebooklm/Radar_Transcricao_Earnings_Aurora.md" download>Earnings — Aurora <span class="dl">↓</span></a>
+      <a class="filechip" href="arquivos-notebooklm/Radar_Painel_Especialistas_IA_Seguros.md" download>Painel de Especialistas <span class="dl">↓</span></a>
+    </div>
+    <p><strong>Agora misture os formatos:</strong> clique em <em>Adicionar fonte → YouTube</em> e cole a URL de uma palestra do setor; depois adicione uma <em>página web</em> oficial (SUSEP ou CNseg) — links na seção Recursos. O NotebookLM processa a transcrição do vídeo e o texto da página e os trata como fontes citáveis, igual aos arquivos.</p>
+    <p>Assim que as fontes terminarem de processar, o NotebookLM já gera um resumo automático e algumas perguntas sugeridas. Leia-as: é o seu mapa inicial do cenário.</p>
+  </div>
+
+  <div class="done-bar" data-done-bar data-mod="02" data-next-label="03 · Conversar com as fontes" data-next-href="#modulo-03"><span class="grow">Notebook criado? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn type="button">Marcar como concluído</button></div>
+</section>
+
+<!-- ===================== MÓDULO 03 ===================== -->
+<section id="modulo-03" class="doc-section">
+  <div class="meta-pill">Ato II · Módulo 03</div>
+  <div class="mod-number">03</div>
+  <h1>Conversar com as fontes</h1>
+  <p class="subtitle">Perguntar, resumir e checar a citação</p>
+  <p>Com as fontes carregadas, o painel central vira um chat. Você pergunta em linguagem natural e a resposta vem com <strong>números de citação</strong> — clique neles para pular ao trecho exato na fonte. Esse hábito de conferir a citação é o que separa o uso amador do uso profissional.</p>
+
+  <h2>Pergunte como pediria a um analista</h2>
+  <p>Seja específico sobre o <em>que</em> quer, o <em>formato</em> e o <em>público</em>. Compare:</p>
+  <div class="compare">
+    <div class="col weak"><div class="k">Fraco</div><p>“Fale sobre o cenário.”</p></div>
+    <div class="col strong"><div class="k">Bom brief</div><p>“Liste em tópicos o que a nova circular exige da liderança: governança de modelos, explicabilidade e prazos de adequação. Cite o artigo de cada item.”</p></div>
+  </div>
+
+  <div class="prompt-label">Cole no chat do notebook</div>
+  <div class="codeblock"><pre>Resuma para o board, em até 8 linhas, o que muda com a nova
+regulação de IA e o que precisamos fazer. Para cada ponto, aponte
+a fonte e o trecho. Use linguagem direta, sem jargão.</pre></div>
+
+  <h2>Coisas úteis para pedir</h2>
+  <table class="t">
+    <thead><tr><th>Você pede</th><th>Ele entrega</th></tr></thead>
+    <tbody>
+      <tr><td>Resumo executivo</td><td>O essencial de uma fonte longa, em tópicos.</td></tr>
+      <tr><td>Extração de campos</td><td>Prazos, percentuais e números — em tabela, com a fonte.</td></tr>
+      <tr><td>Comparação de visões</td><td>“Onde o relatório e o painel concordam e divergem sobre IA?”</td></tr>
+      <tr><td>Localização</td><td>“Onde a circular fala de revisão humana?” → com a citação.</td></tr>
+      <tr><td>Rascunho</td><td>Esboço de um e-mail ao board a partir das fontes.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn"><span class="label">Sempre confira a citação</span>O NotebookLM erra muito menos que um chatbot genérico, mas não é infalível. Antes de levar um número ou uma exigência para uma decisão, <strong>clique na citação e leia o trecho</strong>. Confiar é bom; conferir a fonte é melhor.</div>
+
+  <div class="handson">
+    <div class="ho-head">Mão na massa · três perguntas</div>
+    <h3>Interrogue o Radar</h3>
+    <p>No seu notebook, faça as três perguntas e <strong>clique em cada citação</strong> para validar:</p>
+    <ol class="tips">
+      <li><span class="tip-t">O que a nova circular exige da liderança?</span><span class="tip-s">Governança, explicabilidade e prazos — peça o artigo de cada um.</span></li>
+      <li><span class="tip-t">O que a Aurora reportou no trimestre?</span><span class="tip-s">Crescimento, sinistralidade e margem — com a fonte exata.</span></li>
+      <li><span class="tip-t">Relatório e painel concordam sobre IA?</span><span class="tip-s">Peça uma comparação de visões, ponto a ponto.</span></li>
+    </ol>
+  </div>
+
+  <div class="done-bar" data-done-bar data-mod="03" data-next-label="04 · Visão geral em áudio e vídeo" data-next-href="#modulo-04"><span class="grow">Terminou este módulo? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn type="button">Marcar como concluído</button></div>
+</section>
+
+<!-- ===================== MÓDULO 04 ===================== -->
+<section id="modulo-04" class="doc-section">
+  <div class="meta-pill">Ato II · Módulo 04</div>
+  <div class="mod-number">04</div>
+  <h1>Visão geral em áudio e vídeo</h1>
+  <p class="subtitle">O “podcast” e o vídeo dos seus documentos</p>
+  <p>O recurso mais comentado do NotebookLM é a <span class="term">Visão geral em áudio<span class="tip"><strong>Audio Overview</strong>Um resumo em formato de conversa entre dois apresentadores de IA que discutem as suas fontes, como um episódio de podcast. Ótimo para ouvir no trânsito.</span></span> (<em>Audio Overview</em>): com um clique, ele gera uma conversa em áudio entre dois “apresentadores” de IA que discutem o conteúdo das suas fontes — como um episódio de podcast feito sob medida sobre os seus documentos.</p>
+
+  <h2>Por que um executivo usa isto</h2>
+  <table class="t">
+    <thead><tr><th>Situação</th><th>O áudio resolve</th></tr></thead>
+    <tbody>
+      <tr><td>Muitas fontes para “pegar o espírito”</td><td>Ouvir a essência do cenário no caminho para a reunião.</td></tr>
+      <tr><td>Tema novo de regulação</td><td>Uma explicação acessível da nova circular, em diálogo.</td></tr>
+      <tr><td>Onboarding de equipe</td><td>Um áudio introdutório sobre o tema para o time.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Personalizar e participar</h2>
+  <p>Você pode <strong>direcionar o foco</strong> antes de gerar (“foque nos riscos regulatórios para a diretoria”), ajustar a duração e, no <span class="term">modo interativo<span class="tip"><strong>Modo interativo</strong>Recurso em que você “entra” na conversa do áudio e faz perguntas aos apresentadores de IA ao vivo, e eles respondem com base nas fontes.</span></span>, até “entrar” na conversa e fazer perguntas aos apresentadores ao vivo. Há também a <span class="term">Visão geral em vídeo<span class="tip"><strong>Video Overview</strong>Um resumo visual narrado, com slides gerados a partir das suas fontes — bom para apresentar um tema rapidamente.</span></span> (<em>Video Overview</em>): um resumo visual narrado, útil para apresentar um tema.</p>
+
+  <div class="callout"><span class="label">Disponibilidade e idioma</span>O áudio já é gerado em vários idiomas, incluindo português. Recursos como duração, foco e modo interativo evoluem rápido e podem variar entre versão gratuita e Plus — confirme o que está disponível na sua conta.</div>
+
+  <div class="handson">
+    <div class="ho-head">Mão na massa · gere um áudio</div>
+    <h3>O podcast do cenário</h3>
+    <p>No notebook do Radar, gere uma <strong>Visão geral em áudio</strong> focada na nova regulação e nas tendências de mercado. Antes de gerar, direcione: <em>“Explique para o board o que muda em IA e Open Insurance e o que precisamos fazer, em tom executivo.”</em> Ouça e avalie: serviria para preparar um board em 10 minutos?</p>
+    <p><strong>Bônus com vídeo:</strong> com a palestra do setor (YouTube) já no notebook, gere um áudio que <em>combine</em> a visão dos especialistas com o relatório setorial — um briefing falado do cenário, pronto para o time ouvir.</p>
+  </div>
+
+  <div class="callout warn"><span class="label">Cuidado</span>O áudio é uma <em>síntese</em> — ótimo para o panorama, não para a letra fria. Para um número, um prazo ou uma cláusula que vai para uma decisão, volte ao texto e confira a citação.</div>
+
+  <div class="done-bar" data-done-bar data-mod="04" data-next-label="05 · Notas inteligentes" data-next-href="#modulo-05"><span class="grow">Gerou o áudio? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn type="button">Marcar como concluído</button></div>
+</section>
+
+<!-- ===================== MÓDULO 05 ===================== -->
+<section id="modulo-05" class="doc-section">
+  <div class="meta-pill">Ato II · Módulo 05</div>
+  <div class="mod-number">05</div>
+  <h1>Notas inteligentes</h1>
+  <p class="subtitle">Briefing, FAQ, guia de estudo e mapa mental</p>
+  <p>Ao lado do chat, o NotebookLM tem um painel (às vezes chamado <em>Studio</em>) que gera, com um clique, formatos prontos a partir das suas fontes. É a forma mais rápida de transformar leitura em entregável.</p>
+
+  <table class="t">
+    <thead><tr><th>Formato</th><th>Para quê</th></tr></thead>
+    <tbody>
+      <tr><td><span class="term">Documento de briefing<span class="tip"><strong>Briefing doc</strong>Um resumo executivo estruturado das fontes — temas-chave, pontos principais e citações.</span></span></td><td>Preparar uma reunião ou um comitê.</td></tr>
+      <tr><td>FAQ</td><td>As perguntas mais prováveis, já respondidas.</td></tr>
+      <tr><td>Guia de estudo</td><td>Onboarding de equipe sobre um caso ou processo.</td></tr>
+      <tr><td>Linha do tempo</td><td>Sequência de eventos de um contrato ou processo.</td></tr>
+      <tr><td><span class="term">Mapa mental<span class="tip"><strong>Mapa mental</strong>Um diagrama em árvore dos temas das fontes, navegável — clicar em um ramo abre o detalhe daquele assunto.</span></span></td><td>Enxergar a estrutura de um tema complexo.</td></tr>
+    </tbody>
+  </table>
+
+  <p>Qualquer resposta do chat também pode ser <strong>salva como nota</strong> dentro do notebook, e as notas podem virar, elas mesmas, fonte para novas perguntas. É assim que o notebook acumula conhecimento sobre um caso ao longo do tempo.</p>
+
+  <div class="handson">
+    <div class="ho-head">Mão na massa · do corpus ao entregável</div>
+    <h3>Briefing, mapa mental e guia de estudo do Radar</h3>
+    <p>No notebook, gere um <strong>Documento de briefing</strong> e um <strong>Mapa mental</strong> do cenário. Depois gere um <strong>Guia de estudo</strong> — material pronto para onboard um analista no tema. Por fim, pergunte: <em>“Com base nas fontes, quais são os 3 movimentos que o board precisa acompanhar nos próximos 90 dias?”</em> e salve a resposta como nota.</p>
+  </div>
+
+  <div class="done-bar" data-done-bar data-mod="05" data-next-label="06 · Casos de uso executivos" data-next-href="#modulo-06"><span class="grow">Terminou este módulo? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn type="button">Marcar como concluído</button></div>
+</section>
+
+<!-- ===================== MÓDULO 06 ===================== -->
+<section id="modulo-06" class="doc-section">
+  <div class="meta-pill">Ato III · Módulo 06</div>
+  <div class="mod-number">06</div>
+  <h1>Casos de uso executivos</h1>
+  <p class="subtitle">Onde isto vira tempo e decisão melhor</p>
+  <p>Reunindo o que vimos, aqui estão padrões de uso que rendem para quem decide. Em todos, o ganho é o mesmo: <strong>transformar muito material em uma síntese confiável e rastreável</strong>.</p>
+
+  <table class="t">
+    <thead><tr><th>Caso</th><th>Como montar</th></tr></thead>
+    <tbody>
+      <tr><td>Radar regulatório vivo</td><td>Circular + relatórios + painel → “o que muda e o que fazer”, com citações.</td></tr>
+      <tr><td>Inteligência competitiva</td><td>Transcrições de resultados de concorrentes → comparar números e estratégia.</td></tr>
+      <tr><td>Preparo de board</td><td>As fontes da pauta → briefing + áudio + “3 movimentos a acompanhar”.</td></tr>
+      <tr><td>Revisão de tendências</td><td>Vários relatórios e vídeos → síntese citada do estado da arte.</td></tr>
+      <tr><td>Onboarding e memória de time</td><td>Guia de estudo + FAQ do tema, compartilhado com a equipe.</td></tr>
+    </tbody>
+  </table>
+
+  <details class="box"><summary><span class="tag">Compartilhar</span> Trabalhar em equipe</summary><div class="box-body">
+  <p>Notebooks podem ser <strong>compartilhados</strong> com colegas (com permissão de leitura ou edição), o que transforma um notebook em memória viva de um caso. Recursos de equipe e analytics são mais completos no NotebookLM Plus. Combine com a política interna antes de compartilhar material sensível.</p>
+  </div></details>
+
+  <div class="callout tip"><span class="label">A receita que sempre funciona</span>Um notebook por tema → boas fontes → uma pergunta com brief claro → confira as citações → gere o entregável (briefing, áudio ou mapa mental). Repita.</div>
+
+  <h2>NotebookLM vs Claude — quando usar cada um</h2>
+  <p>As duas ferramentas se complementam. A regra curta: <strong>NotebookLM para <em>entender</em> um conjunto de fontes; Claude para <em>fazer</em> algo com elas.</strong></p>
+  <table class="t">
+    <thead><tr><th>Quando você quer…</th><th>Ferramenta</th><th>Por quê</th></tr></thead>
+    <tbody>
+      <tr><td>Sintetizar e estudar um corpus de fontes confiáveis, com citação rastreável</td><td><strong>NotebookLM</strong></td><td>É fundamentado nas fontes e aponta o trecho exato.</td></tr>
+      <tr><td>Aprender um tema e ouvir no trânsito</td><td><strong>NotebookLM</strong></td><td>Áudio/vídeo overview, guia de estudo e mapa mental.</td></tr>
+      <tr><td>Uma resposta ancorada em “o que as minhas fontes dizem”</td><td><strong>NotebookLM</strong></td><td>Não inventa além das fontes; ótimo para due diligence documental.</td></tr>
+      <tr><td>Delegar uma tarefa e produzir um entregável (parecer, planilha, slide)</td><td><strong>Claude</strong></td><td>Executa passos, cria arquivos e itera com você.</td></tr>
+      <tr><td>Agir sobre sistemas e dados ao vivo, automatizar ou codar</td><td><strong>Claude</strong></td><td>Conectores, código e automações — é um agente.</td></tr>
+      <tr><td>Rascunhar e iterar texto livremente, brainstorm</td><td><strong>Claude</strong></td><td>Conversa aberta e criação, sem se limitar a um corpus.</td></tr>
+    </tbody>
+  </table>
+  <div class="callout gold"><span class="label">Use os dois juntos</span>O fluxo mais poderoso combina as duas: <strong>pesquise e sintetize o cenário no NotebookLM</strong> (com citações confiáveis) e depois <strong>peça ao Claude o entregável</strong> — o e-mail ao board, a planilha de acompanhamento, os slides. Radar no NotebookLM, ação no Claude.</div>
+
+  <div class="done-bar" data-done-bar data-mod="06" data-next-label="07 · Limites, privacidade e governança" data-next-href="#modulo-07"><span class="grow">Terminou este módulo? Marque para acompanhar seu progresso.</span><button class="btn" data-done-btn type="button">Marcar como concluído</button></div>
+</section>
+
+<!-- ===================== MÓDULO 07 ===================== -->
+<section id="modulo-07" class="doc-section">
+  <div class="meta-pill">Ato III · Módulo 07</div>
+  <div class="mod-number">07</div>
+  <h1>Limites, privacidade e governança</h1>
+  <p class="subtitle">O papel da liderança é governar o uso</p>
+  <p>Toda a força do NotebookLM vem de uma coisa: ele lê <em>as fontes que você sobe</em>. Por isso, a pergunta de governança número um é simples: <strong>o que pode ser subido — e para qual conta?</strong></p>
+
+  <h2>O que entra e o que não entra</h2>
+  <table class="t">
+    <thead><tr><th>Pode</th><th>Cuidado / não</th></tr></thead>
+    <tbody>
+      <tr><td>Fontes fictícias e de treino</td><td>Dados pessoais de clientes/segurados (LGPD)</td></tr>
+      <tr><td>Material público (circulares, relatórios, vídeos)</td><td>Documentos sigilosos sem aprovação</td></tr>
+      <tr><td>Documentos internos <em>em conta aprovada</em></td><td>Qualquer dado real em conta pessoal não aprovada</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn"><span class="label">Conta certa</span>Uma conta Google <strong>pessoal</strong> não tem as garantias contratuais de uma conta corporativa (Workspace). Para qualquer documento da empresa, use a conta e o plano que a sua organização aprovou — e confirme as condições com TI/Jurídico.</div>
+
+  <h2>Privacidade dos seus dados</h2>
+  <p>O Google declara que o conteúdo que você sobe ao NotebookLM <strong>não é usado para treinar os modelos</strong> em uso pessoal, e as condições para contas corporativas são reguladas pelo contrato Workspace. Como isso pode mudar, trate a política oficial e o contrato da sua empresa como a fonte da verdade — não a memória do treinamento.</p>
+
+  <h2>Limites a ter em mente</h2>
+  <ol class="tips">
+    <li><span class="tip-t">É síntese, não a letra fria</span><span class="tip-s">Para número, prazo e cláusula que viram decisão, confira a citação na fonte.</span></li>
+    <li><span class="tip-t">Só sabe o que você subiu</span><span class="tip-s">Faltou uma fonte, falta na resposta. Garanta cobertura.</span></li>
+    <li><span class="tip-t">Pode errar</span><span class="tip-s">Erra menos que um chatbot genérico, mas não é infalível. Revisão humana sempre.</span></li>
+    <li><span class="tip-t">Recursos e limites mudam</span><span class="tip-s">Confirme planos, limites e disponibilidade nas fontes oficiais.</span></li>
+  </ol>
+
+  <div class="callout gold"><span class="label">Plano de adoção · 3 passos</span><strong>1)</strong> escolha 1 caso real de baixo risco e monte um notebook esta semana. <strong>2)</strong> defina com TI/Jurídico a conta aprovada e o que pode ser subido. <strong>3)</strong> compartilhe um notebook-modelo com o time e combine a regra de “sempre conferir a citação”.</div>
+
+  <div class="handson">
+    <div class="ho-head">Mão na massa · compromisso</div>
+    <h3>Seu primeiro caso real</h3>
+    <p>Escolha um documento <strong>não sensível</strong> que você lê com frequência. Anote: que notebook você vai criar, qual a primeira pergunta e quem mais usaria essa síntese. Esse é o seu ponto de partida ao sair daqui.</p>
+  </div>
+
+  <div class="done-bar" data-done-bar data-mod="07"><span class="grow">Chegou ao fim. Marque para fechar seu progresso — e parabéns.</span><button class="btn" data-done-btn type="button">Marcar como concluído</button></div>
+</section>
+
+<!-- ===================== RECURSOS ===================== -->
+<section id="recursos" class="doc-section">
+  <div class="meta-pill">Apêndice</div>
+  <h1>Recursos</h1>
+  <p class="subtitle">Pacote de fontes do Radar — Seguros 2026</p>
+  <p>Os arquivos são fictícios (empresa Aurora Seguros S.A.), criados para praticar; os vídeos e páginas são reais e públicos. Suba os arquivos, cole os vídeos e as páginas — assim você monta um radar de verdade e exercita a variedade que o NotebookLM processa.</p>
+
+  <h2>1 · Arquivos para download</h2>
+  <p>O corpus do Radar. Comece pelos quatro do exercício do Módulo 02 e some os demais conforme avançar.</p>
+  <div class="exfiles">
+    <span class="exfiles-label">Corpus do Radar</span>
+    <a class="filechip" href="arquivos-notebooklm/Radar_Circular_SUSEP_Resumo.md" download>Circular Normativa (IA + Open Insurance) <span class="dl">↓</span></a>
+    <a class="filechip" href="arquivos-notebooklm/Radar_Relatorio_Setorial_2026.md" download>Relatório Setorial 2026 <span class="dl">↓</span></a>
+    <a class="filechip" href="arquivos-notebooklm/Radar_Transcricao_Earnings_Aurora.md" download>Earnings — Aurora Seguros <span class="dl">↓</span></a>
+    <a class="filechip" href="arquivos-notebooklm/Radar_Painel_Especialistas_IA_Seguros.md" download>Painel de Especialistas <span class="dl">↓</span></a>
+    <a class="filechip" href="arquivos-notebooklm/Radar_Panorama_e_Glossario.md" download>Panorama &amp; Glossário <span class="dl">↓</span></a>
+    <a class="filechip" href="arquivos-notebooklm/Radar_Fontes_Video_e_Web.md" download>Lista de vídeos e web <span class="dl">↓</span></a>
+  </div>
+
+  <h2>2 · Vídeos do YouTube</h2>
+  <p>O NotebookLM usa a <strong>transcrição</strong> do vídeo como fonte. Em <em>Adicionar fonte → YouTube</em>, cole uma destas URLs:</p>
+  <table class="t">
+    <thead><tr><th>Vídeo</th><th>Para quê</th></tr></thead>
+    <tbody>
+      <tr><td><a href="https://www.youtube.com/watch?v=JZOGlRnHKkw" target="_blank" rel="noopener">Seguros e IA: ficar à frente da curva</a></td><td>Fonte do <em>tema</em> (PT) — IA no setor segurador.</td></tr>
+      <tr><td><a href="https://www.youtube.com/watch?v=fGu8gW-xctA" target="_blank" rel="noopener">Mais inteligência, menos riscos: IA no setor</a></td><td>Outra visão de especialistas para comparar.</td></tr>
+      <tr><td><a href="https://www.youtube.com/watch?v=S32G0w8YFlg" target="_blank" rel="noopener">An Introduction to Google NotebookLM</a></td><td>Opcional — para aprender a própria ferramenta.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3 · Páginas web (fontes oficiais)</h2>
+  <div class="exfiles">
+    <span class="exfiles-label">Cole a URL como fonte</span>
+    <a class="filechip" href="https://www.gov.br/susep/pt-br/assuntos/open-insurance" target="_blank" rel="noopener">SUSEP · Open Insurance ↗</a>
+    <a class="filechip" href="https://opinbrasil.com.br/" target="_blank" rel="noopener">Portal Open Insurance Brasil ↗</a>
+    <a class="filechip" href="https://cnseg.org.br/conteudos/open-insurance" target="_blank" rel="noopener">CNseg · Open Insurance ↗</a>
+  </div>
+
+  <div class="callout warn"><span class="label">Sobre os links externos</span>Vídeos e páginas são de terceiros, só como exemplo de fonte — podem mudar ou sair do ar; confirme antes da aula. Não refletem a posição da sua organização.</div>
+</section>
+
+<!-- ===================== REFERÊNCIA ===================== -->
+<section id="referencia" class="doc-section">
+  <div class="meta-pill">Apêndice</div>
+  <h1>Referência</h1>
+  <p class="subtitle">Onde confirmar o que está vigente</p>
+  <div class="callout"><span class="label">Atenção</span>O NotebookLM evolui rápido: recursos, limites e planos mudam. Antes de aplicar, confirme nas fontes oficiais do Google e na política interna de IA e LGPD da sua organização.</div>
+  <ul class="tips">
+    <li><span class="tip-t">NotebookLM</span><span class="tip-s">notebooklm.google.com — produto, novidades e ajuda.</span></li>
+    <li><span class="tip-t">Limites e planos (Plus)</span><span class="tip-s">Central de Ajuda do NotebookLM e páginas do Google One / Workspace.</span></li>
+    <li><span class="tip-t">Privacidade</span><span class="tip-s">Política de privacidade do NotebookLM e o contrato Workspace da sua empresa.</span></li>
+    <li><span class="tip-t">Política interna</span><span class="tip-s">A política de IA e LGPD da sua organização — sempre a palavra final.</span></li>
+  </ul>
+</section>
+
+</div>
+</main>
+<footer><div class="wrap">
+  <p>Caso fictício — a Aurora Seguros S.A. e os dados do Radar (circular, relatório, earnings e painel) são ilustrativos, criados apenas para o treinamento; os vídeos e páginas são de terceiros. Regra do dia: somente fontes fictícias ou públicas; nunca suba dados reais de clientes, segurados ou pessoas (LGPD), nem documentos sigilosos, em ferramentas/contas não aprovadas pela empresa.</p>
+  <p>O NotebookLM e suas funções, limites e planos evoluem rapidamente. Antes de aplicar, confirme o que está vigente nas fontes oficiais do Google e na política interna de IA e LGPD da sua organização (ver Referência).</p>
+  <div class="flinks"><a href="#topo">Início</a><a href="#modulos">Módulos</a><a href="#recursos">Recursos</a><a href="#referencia">Referência</a></div>
+  <p style="font-size:0.8rem">Programa hands-on · alta liderança · versão interativa.</p>
+</div></footer>
+
+<script>
+/* =========================================================================
+   Dominando o NotebookLM — motor de interatividade
+   Copiar prompts · tooltips de glossário · progresso (localStorage)
+   ========================================================================= */
+(function () {
+  "use strict";
+  var STORAGE_KEY = "treino-notebooklm-progresso";
+  var ORDER = ["00","01","02","03","04","05","06","07"];
+
+  function loadProgress(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e){ return {}; } }
+  function saveProgress(p){ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); } catch(e){} }
+  function isDone(id){ return !!loadProgress()[id]; }
+  function setDone(id,val){ var p=loadProgress(); if(val) p[id]=true; else delete p[id]; saveProgress(p); }
+
+  function initCopy(){
+    document.querySelectorAll(".codeblock").forEach(function(block){
+      if(block.querySelector(".copy-btn")) return;
+      var pre=block.querySelector("pre"); if(!pre) return;
+      var btn=document.createElement("button");
+      btn.className="copy-btn"; btn.type="button"; btn.textContent="Copiar";
+      btn.addEventListener("click", function(){
+        var text=pre.innerText;
+        var done=function(){ btn.textContent="Copiado!"; btn.classList.add("copied");
+          setTimeout(function(){ btn.textContent="Copiar"; btn.classList.remove("copied"); },1600); };
+        if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done, fallback); }
+        else { fallback(); }
+        function fallback(){
+          var ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+          document.body.appendChild(ta); ta.select();
+          try { document.execCommand("copy"); done(); } catch(e){}
+          document.body.removeChild(ta);
+        }
+      });
+      block.appendChild(btn);
+    });
+  }
+
+  function positionTip(t){
+    var tip=t.querySelector(".tip"); if(!tip) return;
+    var r=t.getBoundingClientRect(); var w=tip.offsetWidth;
+    var center=r.left + r.width/2; var left=center - w/2; var m=10, shift=0;
+    if(left<m) shift=m-left; else if(left+w>window.innerWidth-m) shift=(window.innerWidth-m)-(left+w);
+    shift=Math.round(shift);
+    tip.style.transform="translateX(calc(-50% + "+shift+"px)) translateY(-2px)";
+    tip.style.setProperty("--arrow-shift",(-shift)+"px");
+  }
+
+  function initTooltips(){
+    var terms=document.querySelectorAll(".term");
+    terms.forEach(function(t){
+      t.setAttribute("tabindex","0");
+      t.addEventListener("mouseenter", function(){ positionTip(t); });
+      t.addEventListener("focus", function(){ positionTip(t); });
+      t.addEventListener("click", function(e){
+        e.stopPropagation();
+        var wasOpen=t.classList.contains("open");
+        terms.forEach(function(o){ o.classList.remove("open"); });
+        if(!wasOpen){ t.classList.add("open"); positionTip(t); }
+      });
+    });
+    document.addEventListener("click", function(){ terms.forEach(function(o){ o.classList.remove("open"); }); });
+  }
+
+  function refreshList(){
+    var list=document.querySelector("[data-mod-list]"); if(!list) return;
+    var prog=loadProgress(); var doneCount=0;
+    list.querySelectorAll("[data-mod-row]").forEach(function(row){
+      var id=row.getAttribute("data-mod-row");
+      var chk=row.querySelector(".check");
+      if(prog[id]){ row.classList.add("done"); if(chk) chk.textContent="✓"; doneCount++; }
+      else { row.classList.remove("done"); if(chk) chk.textContent=""; }
+    });
+    var total=ORDER.length; var pct=Math.round((doneCount/total)*100);
+    var fill=document.querySelector("[data-progress-fill]");
+    var txt=document.querySelector("[data-progress-text]");
+    if(fill) fill.style.width=pct+"%";
+    if(txt) txt.textContent=doneCount+" de "+total+" módulos concluídos ("+pct+"%)";
+  }
+
+  function initDoneBars(){
+    document.querySelectorAll("[data-done-bar]").forEach(function(bar){
+      var id=bar.getAttribute("data-mod");
+      var btn=bar.querySelector("[data-done-btn]");
+      var nextLabel=bar.getAttribute("data-next-label")||"";
+      var nextHref=bar.getAttribute("data-next-href")||"";
+      function render(){
+        var done=isDone(id);
+        bar.classList.toggle("is-done", done);
+        if(done){ btn.textContent = nextHref ? "✓ Concluído — Próximo: "+nextLabel : "✓ Concluído"; }
+        else { btn.textContent = nextLabel ? "Marcar como concluído — Próximo: "+nextLabel : "Marcar como concluído"; }
+      }
+      btn.addEventListener("click", function(){
+        var done=isDone(id);
+        if(!done){ setDone(id,true); render(); refreshList();
+          if(nextHref) setTimeout(function(){ window.location.hash=nextHref.replace("#",""); },450); }
+        else { setDone(id,false); render(); refreshList(); }
+      });
+      render();
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    initCopy(); initTooltips(); initDoneBars(); refreshList();
+  });
+})();
+</script>
+</body>
+</html>

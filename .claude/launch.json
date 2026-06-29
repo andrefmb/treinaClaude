@@ -1,0 +1,35 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "curso-md",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8099", "--directory", "prosus-curso-ptbr"],
+      "port": 8099
+    },
+    {
+      "name": "treino-seguros",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8090", "--directory", "treinamento-claude-seguros"],
+      "port": 8090
+    },
+    {
+      "name": "treino-executivo-v2",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8091", "--directory", "treinamento-claude-executivo-v2"],
+      "port": 8091
+    },
+    {
+      "name": "treino-notebooklm",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8092", "--directory", "treinamento-notebooklm-executivo"],
+      "port": 8092
+    },
+    {
+      "name": "portal-raiz",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8093"],
+      "port": 8093
+    }
+  ]
+}
